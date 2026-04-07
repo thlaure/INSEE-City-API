@@ -1,0 +1,45 @@
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> IDE ###
+/.idea/
+/.vscode/
+*.swp
+*.swo
+.DS_Store
+###< IDE ###
+
+###> PHP CS Fixer ###
+/.php-cs-fixer.cache
+###< PHP CS Fixer ###
+
+###> PHPUnit ###
+/.phpunit.result.cache
+/coverage/
+###< PHPUnit ###
+
+###> Docker ###
+/docker/postgres/data/
+###< Docker ###
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> Symfony Flex generated ###
+/config/reference.php
+/compose.override.yaml
+###< Symfony Flex generated ###

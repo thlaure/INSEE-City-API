@@ -1,0 +1,60 @@
+{
+    "name": "INSEE City API",
+
+    // Standalone devcontainer with its own Docker daemon (Docker-in-Docker).
+    // This avoids "port already allocated" errors that occur when sharing the
+    // host Docker socket with other running compose stacks.
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+
+    "features": {
+        // Docker-in-Docker: spins up a fully isolated Docker daemon inside
+        // the container. All `docker compose` calls run against this daemon,
+        // so ports are scoped to this devcontainer only.
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest",
+            "moby": true,
+            "dockerDashComposeVersion": "v2"
+        }
+    },
+
+    // Forward ports from the isolated Docker daemon's containers to the host.
+    "forwardPorts": [8000, 4443, 5433],
+    "portsAttributes": {
+        "8000": { "label": "FrankenPHP HTTP",  "onAutoForward": "notify" },
+        "4443": { "label": "FrankenPHP HTTPS", "onAutoForward": "silent" },
+        "5433": { "label": "PostgreSQL",       "onAutoForward": "silent" }
+    },
+
+    "workspaceFolder": "/workspaces/insee-city-api",
+
+    // Build and start the full stack after the devcontainer is created.
+    "postCreateCommand": "make install",
+
+    // Stop the compose stack when the devcontainer window is closed.
+    "shutdownAction": "stopContainer",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bmewburn.vscode-intelephense-client",
+                "junstyle.php-cs-fixer",
+                "xdebug.php-debug",
+                "ms-azuretools.vscode-docker",
+                "redhat.vscode-yaml"
+            ],
+            "settings": {
+                "php.validate.executablePath": "/usr/local/bin/php",
+                "intelephense.environment.phpVersion": "8.5",
+                "intelephense.files.maxSize": 5000000,
+                "[php]": {
+                    "editor.defaultFormatter": "junstyle.php-cs-fixer",
+                    "editor.formatOnSave": true
+                },
+                "editor.formatOnSave": true,
+                "editor.rulers": [120],
+                "files.eol": "\n",
+                "files.insertFinalNewline": true
+            }
+        }
+    }
+}

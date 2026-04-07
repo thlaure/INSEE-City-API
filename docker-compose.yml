@@ -1,0 +1,66 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/frankenphp/Dockerfile.dev
+    container_name: insee-city-api-app
+    restart: unless-stopped
+    ports:
+      - "8001:80"
+      - "4444:443"
+      - "4444:443/udp"
+    volumes:
+      - .:/app:cached
+      - ./docker/frankenphp/php.ini:/usr/local/etc/php/conf.d/app.ini:ro
+      - ./docker/frankenphp/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini:ro
+      - ./docker/frankenphp/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - APP_ENV=${APP_ENV:-dev}
+      - APP_DEBUG=${APP_DEBUG:-1}
+      - APP_SECRET=${APP_SECRET:-changeme}
+      - DATABASE_URL=postgresql://insee:insee@postgres:5432/insee_city?serverVersion=16&charset=utf8
+      - DATABASE_URL_TEST=postgresql://insee:insee@postgres:5432/insee_city_test?serverVersion=16&charset=utf8
+      - FRANKENPHP_CONFIG=worker ./public/index.php
+      - SERVER_NAME=:80
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - insee-city-api
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: insee-city-api-postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: insee
+      POSTGRES_PASSWORD: insee
+      POSTGRES_DB: insee_city
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U insee -d insee_city"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - insee-city-api
+
+networks:
+  insee-city-api:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
