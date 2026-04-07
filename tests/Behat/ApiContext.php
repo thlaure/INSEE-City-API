@@ -9,8 +9,6 @@ use function array_key_exists;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
-use Behat\Mink\Driver\BrowserKitDriver;
-use Behat\Mink\Session;
 
 use function count;
 
@@ -39,7 +37,7 @@ use RuntimeException;
 use function sprintf;
 use function str_contains;
 
-use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 final class ApiContext implements Context
 {
@@ -51,7 +49,7 @@ final class ApiContext implements Context
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly Session $session,
+        private readonly KernelBrowser $client,
     ) {
     }
 
@@ -77,7 +75,7 @@ final class ApiContext implements Context
     public function iSendARequestTo(string $method, string $url): void
     {
         $url = $this->replaceStoredVariables($url);
-        $this->getClient()->request(
+        $this->client->request(
             $method,
             $url,
             [],
@@ -97,7 +95,7 @@ final class ApiContext implements Context
 
         $contentType = $method === 'PATCH' ? 'application/merge-patch+json' : 'application/json';
 
-        $this->getClient()->request(
+        $this->client->request(
             $method,
             $url,
             [],
@@ -113,14 +111,14 @@ final class ApiContext implements Context
      */
     public function theResponseStatusCodeShouldBe(int $code): void
     {
-        $actual = $this->session->getStatusCode();
+        $actual = $this->client->getResponse()->getStatusCode();
 
         if ($actual !== $code) {
             throw new RuntimeException(sprintf(
                 'Expected status code %d, got %d. Response: %s',
                 $code,
                 $actual,
-                $this->session->getPage()->getContent(),
+                $this->client->getResponse()->getContent(),
             ));
         }
     }
@@ -130,9 +128,9 @@ final class ApiContext implements Context
      */
     public function theResponseShouldBeJson(): void
     {
-        $content = $this->session->getPage()->getContent();
+        $content = $this->client->getResponse()->getContent();
         /** @var array<string, mixed>|null $data */
-        $data = json_decode($content, true);
+        $data = json_decode((string) $content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new RuntimeException('Response is not valid JSON: ' . $content);
@@ -241,7 +239,7 @@ final class ApiContext implements Context
      */
     public function theResponseContentTypeShouldContain(string $contentType): void
     {
-        $actual = $this->session->getResponseHeader('Content-Type');
+        $actual = $this->client->getResponse()->headers->get('Content-Type');
 
         if (!str_contains($actual ?? '', $contentType)) {
             throw new RuntimeException(sprintf(
@@ -293,9 +291,9 @@ final class ApiContext implements Context
             return $this->lastResponseData;
         }
 
-        $content = $this->session->getPage()->getContent();
+        $content = $this->client->getResponse()->getContent();
         /** @var array<string, mixed>|null $data */
-        $data = json_decode($content, true);
+        $data = json_decode((string) $content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE || $data === null) {
             throw new RuntimeException('Response is not valid JSON: ' . $content);
@@ -352,19 +350,5 @@ final class ApiContext implements Context
             'CONTENT_TYPE' => $contentType,
             'HTTP_ACCEPT' => 'application/ld+json',
         ];
-    }
-
-    /**
-     * @return AbstractBrowser<object, object>
-     */
-    private function getClient(): AbstractBrowser
-    {
-        $driver = $this->session->getDriver();
-
-        if (!$driver instanceof BrowserKitDriver) {
-            throw new RuntimeException('Driver must be BrowserKitDriver');
-        }
-
-        return $driver->getClient();
     }
 }
