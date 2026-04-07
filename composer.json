@@ -1,0 +1,110 @@
+{
+    "name": "insee-city-api/app",
+    "type": "project",
+    "license": "proprietary",
+    "description": "Symfony/API Platform API exposing French city data from the INSEE API",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.5.0",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "ext-pdo_pgsql": "*",
+        "api-platform/doctrine-orm": "^4.2",
+        "api-platform/symfony": "^4.2",
+        "doctrine/dbal": "^3.10",
+        "doctrine/doctrine-bundle": "^2.18",
+        "doctrine/doctrine-migrations-bundle": "^3.7",
+        "doctrine/orm": "^3.5",
+        "nelmio/cors-bundle": "^2.6",
+        "runtime/frankenphp-symfony": "^0.2",
+        "symfony/console": "7.4.*",
+        "symfony/dotenv": "7.4.*",
+        "symfony/flex": "^2.10",
+        "symfony/framework-bundle": "7.4.*",
+        "symfony/property-access": "7.4.*",
+        "symfony/property-info": "7.4.*",
+        "symfony/runtime": "7.4.*",
+        "symfony/serializer": "7.4.*",
+        "symfony/twig-bundle": "7.4.*",
+        "symfony/uid": "7.4.*",
+        "symfony/validator": "7.4.*",
+        "symfony/yaml": "7.4.*"
+    },
+    "require-dev": {
+        "behat/behat": "^3.29",
+        "doctrine/doctrine-fixtures-bundle": "^4.3",
+        "enlightn/security-checker": "^2.0",
+        "friends-of-behat/mink-browserkit-driver": "^1.6",
+        "friends-of-behat/symfony-extension": "^2.6",
+        "friendsofphp/php-cs-fixer": "^3.91",
+        "phpro/grumphp": ">=2.18",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^11.5",
+        "rector/rector": "^2.3",
+        "symfony/browser-kit": "7.4.*",
+        "symfony/css-selector": "7.4.*",
+        "symfony/phpunit-bridge": "^7.4",
+        "symfony/web-profiler-bundle": "7.4.*"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true,
+            "phpro/grumphp": true
+        },
+        "bump-after-update": true,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "cleanup-flex-scaffold": [
+            "rm -rf src/ApiResource src/Controller src/Repository src/DataFixtures config/packages/twig.yaml config/packages/translation.yaml",
+            "php bin/fix-bundles.php"
+        ],
+        "post-install-cmd": [
+            "@auto-scripts",
+            "@cleanup-flex-scaffold"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts",
+            "@cleanup-flex-scaffold"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "7.4.*",
+            "docker": false
+        }
+    }
+}

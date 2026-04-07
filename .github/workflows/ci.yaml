@@ -1,0 +1,180 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch: ~
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build Docker images
+        run: docker compose build --no-cache
+
+      - name: Start services
+        run: |
+          docker compose up -d
+          echo "Waiting for services to be healthy..."
+          sleep 10
+          docker compose ps
+
+      - name: Print logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Install Composer dependencies
+        run: docker compose exec -T app composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Check HTTP reachability
+        run: |
+          for i in {1..10}; do
+            if curl -s -f http://localhost:8001/api/v1 > /dev/null 2>&1; then
+              echo "App is ready"
+              break
+            fi
+            echo "Waiting for app... ($i/10)"
+            sleep 2
+          done
+          curl -v --fail-with-body http://localhost:8001/api/v1 || true
+
+      - name: Create test database
+        run: docker compose exec -T app php bin/console -e test doctrine:database:create --if-not-exists
+
+      - name: Run migrations
+        run: docker compose exec -T app php bin/console -e test doctrine:migrations:migrate --no-interaction || true
+
+      - name: Run PHPUnit
+        run: docker compose exec -T app vendor/bin/phpunit
+
+      - name: Run PHPUnit with coverage
+        run: |
+          if find tests/Unit -name "*Test.php" | grep -q .; then
+            docker compose exec -T -e XDEBUG_MODE=coverage app vendor/bin/phpunit --testsuite=Unit --coverage-clover var/coverage/clover.xml --coverage-text
+          else
+            echo "No unit tests found, skipping coverage"
+          fi
+
+      - name: Check coverage threshold (80%)
+        run: |
+          if ! find tests/Unit -name "*Test.php" | grep -q .; then
+            echo "No unit tests found, skipping coverage threshold check"
+            exit 0
+          fi
+          COVERAGE=$(docker compose exec -T app php -r "
+            \$xml = simplexml_load_file('var/coverage/clover.xml');
+            \$metrics = \$xml->project->metrics;
+            \$statements = (int)\$metrics['statements'];
+            \$covered = (int)\$metrics['coveredstatements'];
+            echo \$statements > 0 ? round((\$covered / \$statements) * 100, 2) : 100;
+          ")
+          echo "Line coverage: ${COVERAGE}%"
+          if [ "$(echo "${COVERAGE} < 80" | bc)" -eq 1 ]; then
+            echo "::error::Coverage ${COVERAGE}% is below the 80% threshold"
+            exit 1
+          fi
+
+      - name: Run Behat
+        run: docker compose exec -T app vendor/bin/behat --no-interaction --colors
+
+      - name: Audit PHP dependencies
+        # Exit 1 = vulnerabilities (blocking), exit 2 = abandoned packages (non-blocking)
+        run: |
+          docker compose exec -T app composer audit || { code=$?; [ "$code" -eq 2 ] || exit "$code"; }
+
+      - name: Run CS Fixer (dry-run)
+        run: docker compose exec -T app vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: Run PHPStan
+        run: docker compose exec -T app vendor/bin/phpstan analyse
+
+      - name: Run Rector (dry-run)
+        run: docker compose exec -T app vendor/bin/rector process --dry-run
+
+      - name: YAML linter
+        run: docker compose exec -T app php bin/console lint:yaml config
+
+      - name: Doctrine Schema Validator
+        run: docker compose exec -T app php bin/console -e test doctrine:schema:validate --skip-sync || true
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+
+  trivy:
+    name: Trivy Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build prod image
+        run: docker build -f docker/frankenphp/Dockerfile -t insee-city-api:ci .
+
+      - name: Scan image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: insee-city-api:ci
+          format: table
+          exit-code: 1
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      - name: Scan repository for misconfigurations
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          exit-code: 1
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+  lint:
+    name: Docker Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Lint Dockerfile (dev)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: docker/frankenphp/Dockerfile.dev
+          failure-threshold: error
+
+      - name: Lint Dockerfile (prod)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: docker/frankenphp/Dockerfile
+          failure-threshold: error

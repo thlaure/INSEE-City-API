@@ -1,0 +1,66 @@
+grumphp:
+    process_timeout: 120
+    git_hook_variables:
+        EXEC_GRUMPHP_COMMAND: ['docker', 'compose', 'exec', '-T', 'app']
+    tasks:
+        git_commit_message:
+            enforce_capitalized_subject: false
+            max_subject_width: 72
+            type_scope_conventions:
+                - types:
+                      - build
+                      - ci
+                      - chore
+                      - docs
+                      - feat
+                      - fix
+                      - perf
+                      - refactor
+                      - revert
+                      - style
+                      - test
+
+        git_blacklist:
+            keywords:
+                - "die("
+                - "var_dump("
+                - "exit;"
+                - "exit();"
+                - "print_r("
+                - "dd("
+            whitelist_patterns: []
+            triggered_by: ['php']
+            regexp_type: G
+
+        yamllint:
+            ignore_patterns: ["config/services.yaml"]
+
+        securitychecker_enlightn:
+            lockfile: ./composer.lock
+
+        phpstan:
+            level: 9
+            configuration: phpstan.neon
+            memory_limit: "-1"
+            use_grumphp_paths: false
+
+        phpcsfixer:
+            allow_risky: true
+            config_contains_finder: true
+            config: .php-cs-fixer.dist.php
+            verbose: true
+            diff: true
+            triggered_by: ["php"]
+
+        phpunit:
+            testsuite: Unit
+            always_execute: true
+
+        behat:
+            config: behat.yaml.dist
+            suite: api
+
+        rector:
+            config: rector.php
+            no_diffs: false
+            triggered_by: ["php"]
