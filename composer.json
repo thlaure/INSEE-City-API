@@ -26,7 +26,6 @@
         "symfony/property-info": "7.4.*",
         "symfony/runtime": "7.4.*",
         "symfony/serializer": "7.4.*",
-        "symfony/translation": "7.4.*",
         "symfony/twig-bundle": "7.4.*",
         "symfony/uid": "7.4.*",
         "symfony/validator": "7.4.*",
@@ -86,7 +85,7 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "cleanup-flex-scaffold": [
-            "rm -rf src/ApiResource src/Controller src/Repository src/DataFixtures config/packages/twig.yaml",
+            "rm -rf src/ApiResource src/Controller src/Repository src/DataFixtures config/packages/twig.yaml config/packages/translation.yaml",
             "php bin/fix-bundles.php"
         ],
         "post-install-cmd": [
