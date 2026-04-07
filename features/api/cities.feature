@@ -56,3 +56,33 @@ Feature: City API
     When I send a "GET" request to "/api/v1/cities"
     Then the response status code should be 200
     And the response content type should contain "application/ld+json"
+
+  Scenario: GET /api/v1/cities rejects empty name filter
+    Given there are no cities in the database
+    When I send a "GET" request to "/api/v1/cities?name="
+    Then the response status code should be 422
+    And the response should be JSON
+
+  Scenario: GET /api/v1/cities rejects empty departmentCode filter
+    Given there are no cities in the database
+    When I send a "GET" request to "/api/v1/cities?departmentCode="
+    Then the response status code should be 422
+    And the response should be JSON
+
+  Scenario: GET /api/v1/cities rejects empty regionCode filter
+    Given there are no cities in the database
+    When I send a "GET" request to "/api/v1/cities?regionCode="
+    Then the response status code should be 422
+    And the response should be JSON
+
+  Scenario: GET /api/v1/cities rejects page less than 1
+    Given there are no cities in the database
+    When I send a "GET" request to "/api/v1/cities?page=0"
+    Then the response status code should be 422
+    And the response should be JSON
+
+  Scenario: GET /api/v1/cities rejects itemsPerPage greater than 100
+    Given there are no cities in the database
+    When I send a "GET" request to "/api/v1/cities?itemsPerPage=101"
+    Then the response status code should be 422
+    And the response should be JSON
