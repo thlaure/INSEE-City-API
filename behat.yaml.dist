@@ -5,6 +5,7 @@ default:
         - '%paths.base%/features/api'
       contexts:
         - App\Tests\Behat\ApiContext
+        - App\Tests\Behat\CityFixtureContext
 
   extensions:
     FriendsOfBehat\SymfonyExtension:

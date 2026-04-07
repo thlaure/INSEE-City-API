@@ -7,3 +7,7 @@ services:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
             $client: '@test.client'
+
+    App\Tests\Behat\CityFixtureContext:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
