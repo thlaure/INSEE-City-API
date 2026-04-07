@@ -26,9 +26,6 @@ use function json_encode;
 use const JSON_ERROR_NONE;
 
 use function json_last_error;
-
-use const JSON_THROW_ON_ERROR;
-
 use function preg_match;
 use function preg_replace_callback;
 
