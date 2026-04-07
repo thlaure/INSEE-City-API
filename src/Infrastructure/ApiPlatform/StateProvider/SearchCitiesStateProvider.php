@@ -6,9 +6,12 @@ namespace App\Infrastructure\ApiPlatform\StateProvider;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Validator\Exception\ValidationException;
 use App\Domain\City\Handler\SearchCitiesHandler;
 use App\Domain\City\Query\SearchCitiesQuery;
+use App\Infrastructure\ApiPlatform\Input\CitySearchFilters;
 use App\Infrastructure\ApiPlatform\Paginator\CityPaginator;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @implements ProviderInterface<CityPaginator>
@@ -17,6 +20,7 @@ final readonly class SearchCitiesStateProvider implements ProviderInterface
 {
     public function __construct(
         private SearchCitiesHandler $searchCitiesHandler,
+        private ValidatorInterface $validator,
     ) {
     }
 
@@ -26,26 +30,36 @@ final readonly class SearchCitiesStateProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): CityPaginator
     {
-        /** @var array<string, string> $filters */
-        $filters = $context['filters'] ?? [];
+        /** @var array<string, string> $rawFilters */
+        $rawFilters = $context['filters'] ?? [];
 
-        $page = isset($filters['page']) ? max(1, (int) $filters['page']) : 1;
-        $itemsPerPage = isset($filters['itemsPerPage']) ? max(1, min(100, (int) $filters['itemsPerPage'])) : 30;
+        $filters = new CitySearchFilters();
+        $filters->name = $rawFilters['name'] ?? null;
+        $filters->departmentCode = $rawFilters['departmentCode'] ?? null;
+        $filters->regionCode = $rawFilters['regionCode'] ?? null;
+        $filters->page = isset($rawFilters['page']) ? (int) $rawFilters['page'] : 1;
+        $filters->itemsPerPage = isset($rawFilters['itemsPerPage']) ? (int) $rawFilters['itemsPerPage'] : 30;
+
+        $violations = $this->validator->validate($filters);
+
+        if ($violations->count() > 0) {
+            throw new ValidationException($violations);
+        }
 
         $query = new SearchCitiesQuery(
-            name: $filters['name'] ?? null,
-            departmentCode: $filters['departmentCode'] ?? null,
-            regionCode: $filters['regionCode'] ?? null,
-            page: $page,
-            itemsPerPage: $itemsPerPage,
+            name: $filters->name,
+            departmentCode: $filters->departmentCode,
+            regionCode: $filters->regionCode,
+            page: $filters->page,
+            itemsPerPage: $filters->itemsPerPage,
         );
 
         $collection = ($this->searchCitiesHandler)($query);
 
         return new CityPaginator(
             collection: $collection,
-            currentPage: $page,
-            itemsPerPage: $itemsPerPage,
+            currentPage: $filters->page,
+            itemsPerPage: $filters->itemsPerPage,
         );
     }
 }
