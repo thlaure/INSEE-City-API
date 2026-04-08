@@ -19,11 +19,9 @@ use Symfony\Component\Uid\UuidV7;
 #[ApiResource(shortName: 'City', operations: [
     new Get(
         uriTemplate: '/cities/{inseeCode}',
-        cacheHeaders: ['max_age' => 3600, 'public' => true],
     ),
     new GetCollection(
         uriTemplate: '/cities',
-        cacheHeaders: ['max_age' => 3600, 'public' => true],
         paginationEnabled: true,
         paginationItemsPerPage: 30,
         paginationMaximumItemsPerPage: 1000,

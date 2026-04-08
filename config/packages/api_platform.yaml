@@ -40,7 +40,21 @@ api_platform:
         paths:
             - '%kernel.project_dir%/src/Entity'
 
+when@dev:
+    api_platform:
+        defaults:
+            cache_headers:
+                max_age: 0
+                shared_max_age: 0
+                public: false
+                no_store: true
+
 when@prod:
     api_platform:
         enable_swagger_ui: false
         enable_docs: false
+        defaults:
+            cache_headers:
+                max_age: 3600
+                shared_max_age: 3600
+                public: true
