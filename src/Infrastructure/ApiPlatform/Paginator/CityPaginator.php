@@ -37,7 +37,7 @@ final readonly class CityPaginator implements IteratorAggregate, PaginatorInterf
 
     public function getLastPage(): float
     {
-        if ($this->itemsPerPage === 0 || $this->collection->getTotalCount() === 0) {
+        if (0 === $this->itemsPerPage || 0 === $this->collection->getTotalCount()) {
             return 1.0;
         }
 
@@ -73,7 +73,7 @@ final readonly class CityPaginator implements IteratorAggregate, PaginatorInterf
                 name: $city->name,
                 departmentCode: $city->departmentCode,
                 regionCode: $city->regionCode,
-                population: $city->population,
+                postalCode: $city->postalCode,
             );
         }
 

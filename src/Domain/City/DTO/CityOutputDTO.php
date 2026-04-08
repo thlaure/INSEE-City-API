@@ -13,7 +13,7 @@ final readonly class CityOutputDTO
         public string $name,
         public string $departmentCode,
         public string $regionCode,
-        public ?int $population,
+        public string $postalCode,
     ) {
     }
 
@@ -24,7 +24,7 @@ final readonly class CityOutputDTO
             name: $city->name,
             departmentCode: $city->departmentCode,
             regionCode: $city->regionCode,
-            population: $city->population,
+            postalCode: $city->postalCode,
         );
     }
 }

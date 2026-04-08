@@ -19,8 +19,8 @@ class City
     #[ORM\Column(type: 'uuid', unique: true)]
     private UuidV7 $id;
 
-    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
-    private ?int $population = null;
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10)]
+    private string $postalCode = '';
 
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)]
     private DateTimeImmutable $updatedAt;
@@ -66,9 +66,9 @@ class City
         return $this->regionCode;
     }
 
-    public function getPopulation(): ?int
+    public function getPostalCode(): string
     {
-        return $this->population;
+        return $this->postalCode;
     }
 
     public function getCreatedAt(): DateTimeImmutable
@@ -85,12 +85,12 @@ class City
         string $name,
         string $departmentCode,
         string $regionCode,
-        ?int $population,
+        string $postalCode,
     ): void {
         $this->name = $name;
         $this->departmentCode = $departmentCode;
         $this->regionCode = $regionCode;
-        $this->population = $population;
+        $this->postalCode = $postalCode;
         $this->updatedAt = new DateTimeImmutable();
     }
 }

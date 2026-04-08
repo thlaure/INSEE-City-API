@@ -32,7 +32,7 @@ final class GetCityHandlerTest extends TestCase
             name: 'Paris',
             departmentCode: '75',
             regionCode: '11',
-            population: 2133111,
+            postalCode: '75001',
             createdAt: new DateTimeImmutable(),
             updatedAt: new DateTimeImmutable(),
         );

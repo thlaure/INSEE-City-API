@@ -19,7 +19,7 @@ final readonly class ImportCitiesHandler
 
     public function __invoke(): ImportResultDTO
     {
-        $rawCities = $this->dataProvider->fetchAllCommunes();
+        $rawCities = $this->dataProvider->fetchAllCities();
         $created = 0;
         $updated = 0;
         $batchCount = 0;
@@ -27,7 +27,7 @@ final readonly class ImportCitiesHandler
             $isNew = $this->cityRepository->save(City::fromGeoApiData($raw));
             $isNew ? ++$created : ++$updated;
 
-            if (++$batchCount % 50 === 0) {
+            if (0 === ++$batchCount % 50) {
                 $this->cityRepository->flush();
             }
         }

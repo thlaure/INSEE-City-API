@@ -34,7 +34,7 @@ final readonly class DoctrineCityRepository implements CityRepositoryInterface
     {
         $entity = $this->repository->findOneBy(['inseeCode' => $city->inseeCode]);
 
-        if ($entity === null) {
+        if (null === $entity) {
             $entity = new CityEntity(
                 inseeCode: $city->inseeCode,
                 name: $city->name,
@@ -46,7 +46,7 @@ final readonly class DoctrineCityRepository implements CityRepositoryInterface
                 name: $city->name,
                 departmentCode: $city->departmentCode,
                 regionCode: $city->regionCode,
-                population: $city->population,
+                postalCode: $city->postalCode,
             );
             $this->entityManager->persist($entity);
 
@@ -57,7 +57,7 @@ final readonly class DoctrineCityRepository implements CityRepositoryInterface
             name: $city->name,
             departmentCode: $city->departmentCode,
             regionCode: $city->regionCode,
-            population: $city->population,
+            postalCode: $city->postalCode,
         );
 
         return false;
@@ -72,17 +72,17 @@ final readonly class DoctrineCityRepository implements CityRepositoryInterface
     {
         $qb = $this->repository->createQueryBuilder('c');
 
-        if ($criteria->name !== null) {
+        if (null !== $criteria->name) {
             $qb->andWhere('LOWER(c.name) LIKE LOWER(:name)')
-                ->setParameter('name', '%' . $criteria->name . '%');
+                ->setParameter('name', '%'.$criteria->name.'%');
         }
 
-        if ($criteria->departmentCode !== null) {
+        if (null !== $criteria->departmentCode) {
             $qb->andWhere('c.departmentCode = :departmentCode')
                 ->setParameter('departmentCode', $criteria->departmentCode);
         }
 
-        if ($criteria->regionCode !== null) {
+        if (null !== $criteria->regionCode) {
             $qb->andWhere('c.regionCode = :regionCode')
                 ->setParameter('regionCode', $criteria->regionCode);
         }
@@ -111,7 +111,7 @@ final readonly class DoctrineCityRepository implements CityRepositoryInterface
             name: $entity->getName(),
             departmentCode: $entity->getDepartmentCode(),
             regionCode: $entity->getRegionCode(),
-            population: $entity->getPopulation(),
+            postalCode: $entity->getPostalCode(),
             createdAt: $entity->getCreatedAt(),
             updatedAt: $entity->getUpdatedAt(),
         );

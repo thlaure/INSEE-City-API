@@ -125,7 +125,7 @@ final class DoctrineCityRepositoryTest extends DatabaseTestCase
             name: $name,
             departmentCode: $dept,
             regionCode: $region,
-            population: null,
+            postalCode: '',
             createdAt: new DateTimeImmutable(),
             updatedAt: new DateTimeImmutable(),
         );

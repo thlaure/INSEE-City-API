@@ -16,7 +16,7 @@ final class CityTest extends TestCase
             'nom' => 'Paris',
             'codeDepartement' => '75',
             'codeRegion' => '11',
-            'population' => 2133111,
+            'codesPostaux' => ['75001', '75002'],
         ];
 
         $city = City::fromGeoApiData($raw);
@@ -25,21 +25,22 @@ final class CityTest extends TestCase
         $this->assertSame('Paris', $city->name);
         $this->assertSame('75', $city->departmentCode);
         $this->assertSame('11', $city->regionCode);
-        $this->assertSame(2133111, $city->population);
+        $this->assertSame('75001', $city->postalCode);
     }
 
-    public function testFromGeoApiDataWithNullPopulation(): void
+    public function testFromGeoApiDataWithEmptyPostalCodes(): void
     {
         $raw = [
             'code' => '01001',
             'nom' => 'L\'Abergement-Clémenciat',
             'codeDepartement' => '01',
             'codeRegion' => '84',
+            'codesPostaux' => [],
         ];
 
         $city = City::fromGeoApiData($raw);
 
-        $this->assertNull($city->population);
+        $this->assertSame('', $city->postalCode);
     }
 
     public function testFromGeoApiDataWithMissingFieldsUsesEmptyDefaults(): void
@@ -50,6 +51,6 @@ final class CityTest extends TestCase
         $this->assertSame('', $city->name);
         $this->assertSame('', $city->departmentCode);
         $this->assertSame('', $city->regionCode);
-        $this->assertNull($city->population);
+        $this->assertSame('', $city->postalCode);
     }
 }

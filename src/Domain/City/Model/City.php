@@ -6,7 +6,7 @@ namespace App\Domain\City\Model;
 
 use DateTimeImmutable;
 
-use function is_int;
+use function is_array;
 use function is_string;
 
 final readonly class City
@@ -16,7 +16,7 @@ final readonly class City
         public string $name,
         public string $departmentCode,
         public string $regionCode,
-        public ?int $population,
+        public string $postalCode,
         public DateTimeImmutable $createdAt,
         public DateTimeImmutable $updatedAt,
     ) {
@@ -32,14 +32,15 @@ final readonly class City
         $nom = $raw['nom'] ?? '';
         $dept = $raw['codeDepartement'] ?? '';
         $region = $raw['codeRegion'] ?? '';
-        $pop = $raw['population'] ?? null;
+        $postalCodes = $raw['codesPostaux'] ?? [];
+        $firstPostalCode = is_array($postalCodes) && [] !== $postalCodes ? $postalCodes[0] : '';
 
         return new self(
             inseeCode: is_string($code) ? $code : '',
             name: is_string($nom) ? $nom : '',
             departmentCode: is_string($dept) ? $dept : '',
             regionCode: is_string($region) ? $region : '',
-            population: is_int($pop) ? $pop : null,
+            postalCode: is_string($firstPostalCode) ? $firstPostalCode : '',
             createdAt: $now,
             updatedAt: $now,
         );

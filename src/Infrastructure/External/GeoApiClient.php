@@ -6,6 +6,7 @@ namespace App\Infrastructure\External;
 
 use App\Domain\City\Exception\CityDataProviderException;
 use App\Domain\City\Port\CityDataProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 
@@ -13,7 +14,7 @@ final readonly class GeoApiClient implements CityDataProviderInterface
 {
     private const string COMMUNES_PATH = '/communes';
 
-    private const string FIELDS = 'code,nom,codeDepartement,codeRegion,population';
+    private const string FIELDS = 'code,nom,codeDepartement,codeRegion,codesPostaux';
 
     public function __construct(
         private HttpClientInterface $httpClient,
@@ -24,10 +25,10 @@ final readonly class GeoApiClient implements CityDataProviderInterface
     /**
      * @return array<array<string, mixed>>
      */
-    public function fetchAllCommunes(): array
+    public function fetchAllCities(): array
     {
         try {
-            $response = $this->httpClient->request('GET', $this->baseUrl . self::COMMUNES_PATH, [
+            $response = $this->httpClient->request(Request::METHOD_GET, $this->baseUrl.self::COMMUNES_PATH, [
                 'query' => [
                     'fields' => self::FIELDS,
                     'format' => 'json',
