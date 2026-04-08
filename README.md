@@ -25,8 +25,6 @@ Symfony/API Platform API exposing French city data from the [INSEE API](https://
 ## Quick Start
 
 ```bash
-git clone git@github.com:thlaure/INSEE-City-API.git
-cd insee-city-api
 make install
 ```
 

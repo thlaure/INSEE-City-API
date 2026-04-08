@@ -66,6 +66,7 @@ final readonly class DoctrineCityRepository implements CityRepositoryInterface
     public function flush(): void
     {
         $this->entityManager->flush();
+        $this->entityManager->clear();
     }
 
     public function findByCriteria(CitySearchCriteria $criteria): CityCollection
