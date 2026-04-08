@@ -45,7 +45,7 @@ final readonly class GetCityStateProvider implements ProviderInterface
             name: $city->name,
             departmentCode: $city->departmentCode,
             regionCode: $city->regionCode,
-            population: $city->population,
+            postalCode: $city->postalCode,
         );
     }
 }

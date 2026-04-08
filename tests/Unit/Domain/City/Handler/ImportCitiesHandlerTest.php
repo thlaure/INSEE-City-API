@@ -30,7 +30,7 @@ final class ImportCitiesHandlerTest extends TestCase
     public function testInvokeWithEmptyDataReturnsZeroTotals(): void
     {
         $this->dataProvider->expects($this->once())
-            ->method('fetchAllCommunes')
+            ->method('fetchAllCities')
             ->willReturn([]);
 
         $this->cityRepository->expects($this->once())
@@ -46,12 +46,12 @@ final class ImportCitiesHandlerTest extends TestCase
     public function testInvokeCreatesNewCitiesAndReturnsCounts(): void
     {
         $raw = [
-            ['code' => '75056', 'nom' => 'Paris', 'codeDepartement' => '75', 'codeRegion' => '11', 'population' => 2133111],
-            ['code' => '69123', 'nom' => 'Lyon', 'codeDepartement' => '69', 'codeRegion' => '84', 'population' => 522969],
+            ['code' => '75056', 'nom' => 'Paris', 'codeDepartement' => '75', 'codeRegion' => '11', 'codesPostaux' => ['75001']],
+            ['code' => '69123', 'nom' => 'Lyon', 'codeDepartement' => '69', 'codeRegion' => '84', 'codesPostaux' => ['69001']],
         ];
 
         $this->dataProvider->expects($this->once())
-            ->method('fetchAllCommunes')
+            ->method('fetchAllCities')
             ->willReturn($raw);
 
         $this->cityRepository->expects($this->exactly(2))
@@ -68,11 +68,11 @@ final class ImportCitiesHandlerTest extends TestCase
     public function testInvokeUpdatesExistingCitiesAndReturnsCounts(): void
     {
         $raw = [
-            ['code' => '75056', 'nom' => 'Paris', 'codeDepartement' => '75', 'codeRegion' => '11', 'population' => 2133111],
+            ['code' => '75056', 'nom' => 'Paris', 'codeDepartement' => '75', 'codeRegion' => '11', 'codesPostaux' => ['75001']],
         ];
 
         $this->dataProvider->expects($this->once())
-            ->method('fetchAllCommunes')
+            ->method('fetchAllCities')
             ->willReturn($raw);
 
         $this->cityRepository->expects($this->once())
@@ -88,10 +88,10 @@ final class ImportCitiesHandlerTest extends TestCase
 
     public function testInvokeFlushesEvery50Cities(): void
     {
-        $raw = array_fill(0, 100, ['code' => '75056', 'nom' => 'Paris', 'codeDepartement' => '75', 'codeRegion' => '11', 'population' => null]);
+        $raw = array_fill(0, 100, ['code' => '75056', 'nom' => 'Paris', 'codeDepartement' => '75', 'codeRegion' => '11', 'codesPostaux' => []]);
 
         $this->dataProvider->expects($this->once())
-            ->method('fetchAllCommunes')
+            ->method('fetchAllCities')
             ->willReturn($raw);
 
         $this->cityRepository->expects($this->any())
@@ -108,7 +108,7 @@ final class ImportCitiesHandlerTest extends TestCase
     public function testInvokeThrowsWhenDataProviderFails(): void
     {
         $this->dataProvider->expects($this->once())
-            ->method('fetchAllCommunes')
+            ->method('fetchAllCities')
             ->willThrowException(CityDataProviderException::fromPrevious(new RuntimeException('timeout')));
 
         $this->expectException(CityDataProviderException::class);

@@ -48,7 +48,7 @@ final class CityCollectionTest extends TestCase
             name: $name,
             departmentCode: '75',
             regionCode: '11',
-            population: null,
+            postalCode: '',
             createdAt: new DateTimeImmutable(),
             updatedAt: new DateTimeImmutable(),
         );

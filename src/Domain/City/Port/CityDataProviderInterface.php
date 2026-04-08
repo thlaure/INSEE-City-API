@@ -7,9 +7,9 @@ namespace App\Domain\City\Port;
 interface CityDataProviderInterface
 {
     /**
-     * Fetch all communes from the external data source.
+     * Fetch all cities from the external data source.
      *
      * @return array<array<string, mixed>>
      */
-    public function fetchAllCommunes(): array;
+    public function fetchAllCities(): array;
 }

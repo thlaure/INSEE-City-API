@@ -64,7 +64,7 @@ use App\Infrastructure\ApiPlatform\StateProvider\SearchCitiesStateProvider;
                     new OpenApiParameter(
                         name: 'itemsPerPage',
                         in: 'query',
-                        description: 'Number of results per page (1–100). Defaults to 30.',
+                        description: 'Number of results per page (1-100). Defaults to 30.',
                         required: false,
                         schema: ['type' => 'integer', 'minimum' => 1, 'maximum' => 100, 'default' => 30, 'example' => 30],
                     ),
@@ -101,10 +101,10 @@ final readonly class CityResource
         public string $regionCode = '',
 
         #[ApiProperty(
-            description: 'Latest known population figure. `null` if unavailable.',
-            example: 2133111,
+            description: 'First postal code of the commune (empty string if unavailable).',
+            example: '75001',
         )]
-        public ?int $population = null,
+        public string $postalCode = '',
     ) {
     }
 }
