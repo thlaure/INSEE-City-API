@@ -35,6 +35,7 @@ final readonly class CityFixtureContext implements Context
                 name: $row['name'],
                 departmentCode: $row['departmentCode'],
                 regionCode: $row['regionCode'],
+                postalCode: $row['postalCode'] ?? '',
                 createdAt: new DateTimeImmutable(),
             );
 

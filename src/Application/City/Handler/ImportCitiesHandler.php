@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\City\Handler;
+namespace App\Application\City\Handler;
 
-use App\Domain\City\DTO\ImportResultDTO;
-use App\Domain\City\Model\City;
+use App\Application\City\DTO\ImportResultDTO;
 use App\Domain\City\Port\CityDataProviderInterface;
 use App\Domain\City\Port\CityRepositoryInterface;
 
@@ -19,18 +18,20 @@ final readonly class ImportCitiesHandler
 
     public function __invoke(): ImportResultDTO
     {
-        $rawCities = $this->dataProvider->fetchAllCities();
+        $cities = $this->dataProvider->fetchAllCities();
         $created = 0;
         $updated = 0;
         $batchCount = 0;
-        foreach ($rawCities as $raw) {
-            $isNew = $this->cityRepository->save(City::fromGeoApiData($raw));
+
+        foreach ($cities as $city) {
+            $isNew = $this->cityRepository->save($city);
             $isNew ? ++$created : ++$updated;
 
             if (0 === ++$batchCount % 50) {
                 $this->cityRepository->flush();
             }
         }
+
         $this->cityRepository->flush();
 
         return new ImportResultDTO(

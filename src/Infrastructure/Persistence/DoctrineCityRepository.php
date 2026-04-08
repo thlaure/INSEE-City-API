@@ -5,116 +5,93 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence;
 
 use App\Domain\City\Model\City as DomainCity;
-use App\Domain\City\Model\CityCollection;
-use App\Domain\City\Model\CitySearchCriteria;
 use App\Domain\City\Port\CityRepositoryInterface;
-use App\Entity\City as CityEntity;
+use DateTimeInterface;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
+use Symfony\Component\Uid\UuidV7;
 
-final readonly class DoctrineCityRepository implements CityRepositoryInterface
+final class DoctrineCityRepository implements CityRepositoryInterface
 {
-    /** @var EntityRepository<CityEntity> */
-    private EntityRepository $repository;
+    /** @var array<string, true>|null */
+    private ?array $knownInseeCodes = null;
+
+    private readonly Connection $connection;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        EntityManagerInterface $entityManager,
     ) {
-        $this->repository = $entityManager->getRepository(CityEntity::class);
-    }
-
-    public function findByInseeCode(string $inseeCode): ?DomainCity
-    {
-        $entity = $this->repository->findOneBy(['inseeCode' => $inseeCode]);
-
-        return $entity instanceof CityEntity ? $this->toDomainModel($entity) : null;
+        $this->connection = $entityManager->getConnection();
     }
 
     public function save(DomainCity $city): bool
     {
-        $entity = $this->repository->findOneBy(['inseeCode' => $city->inseeCode]);
+        $knownInseeCodes = $this->getKnownInseeCodes();
+        $isNew = !isset($knownInseeCodes[$city->inseeCode]);
 
-        if (null === $entity) {
-            $entity = new CityEntity(
-                inseeCode: $city->inseeCode,
-                name: $city->name,
-                departmentCode: $city->departmentCode,
-                regionCode: $city->regionCode,
-                createdAt: $city->createdAt,
-            );
-            $entity->updateFromDomainModel(
-                name: $city->name,
-                departmentCode: $city->departmentCode,
-                regionCode: $city->regionCode,
-                postalCode: $city->postalCode,
-            );
-            $this->entityManager->persist($entity);
-
-            return true;
-        }
-
-        $entity->updateFromDomainModel(
-            name: $city->name,
-            departmentCode: $city->departmentCode,
-            regionCode: $city->regionCode,
-            postalCode: $city->postalCode,
+        $this->connection->executeStatement(
+            <<<'SQL'
+                INSERT INTO cities (id, insee_code, name, department_code, region_code, postal_code, created_at, updated_at)
+                VALUES (:id, :insee_code, :name, :department_code, :region_code, :postal_code, :created_at, :updated_at)
+                ON CONFLICT (insee_code) DO UPDATE SET
+                    name = EXCLUDED.name,
+                    department_code = EXCLUDED.department_code,
+                    region_code = EXCLUDED.region_code,
+                    postal_code = EXCLUDED.postal_code,
+                    updated_at = EXCLUDED.updated_at
+            SQL,
+            [
+                'id' => (string) new UuidV7(),
+                'insee_code' => $city->inseeCode,
+                'name' => $city->name,
+                'department_code' => $city->departmentCode,
+                'region_code' => $city->regionCode,
+                'postal_code' => $city->postalCode,
+                'created_at' => $this->formatDateTime($city->createdAt),
+                'updated_at' => $this->formatDateTime($city->updatedAt),
+            ],
+            [
+                'id' => ParameterType::STRING,
+                'insee_code' => ParameterType::STRING,
+                'name' => ParameterType::STRING,
+                'department_code' => ParameterType::STRING,
+                'region_code' => ParameterType::STRING,
+                'postal_code' => ParameterType::STRING,
+                'created_at' => ParameterType::STRING,
+                'updated_at' => ParameterType::STRING,
+            ],
         );
 
-        return false;
+        if ($isNew) {
+            $this->knownInseeCodes[$city->inseeCode] = true;
+        }
+
+        return $isNew;
     }
 
     public function flush(): void
     {
-        $this->entityManager->flush();
-        $this->entityManager->clear();
     }
 
-    public function findByCriteria(CitySearchCriteria $criteria): CityCollection
+    /**
+     * @return array<string, true>
+     */
+    private function getKnownInseeCodes(): array
     {
-        $qb = $this->repository->createQueryBuilder('c');
-
-        if (null !== $criteria->name) {
-            $qb->andWhere('LOWER(c.name) LIKE LOWER(:name)')
-                ->setParameter('name', '%' . $criteria->name . '%');
+        if ($this->knownInseeCodes !== null) {
+            return $this->knownInseeCodes;
         }
 
-        if (null !== $criteria->departmentCode) {
-            $qb->andWhere('c.departmentCode = :departmentCode')
-                ->setParameter('departmentCode', $criteria->departmentCode);
-        }
+        /** @var list<string> $codes */
+        $codes = $this->connection->fetchFirstColumn('SELECT insee_code FROM cities');
+        $this->knownInseeCodes = array_fill_keys($codes, true);
 
-        if (null !== $criteria->regionCode) {
-            $qb->andWhere('c.regionCode = :regionCode')
-                ->setParameter('regionCode', $criteria->regionCode);
-        }
-
-        $countQb = clone $qb;
-        $totalCount = (int) $countQb->select('COUNT(c.id)')->getQuery()->getSingleScalarResult();
-
-        $offset = ($criteria->page - 1) * $criteria->itemsPerPage;
-        $qb->orderBy('c.name', 'ASC')
-            ->setFirstResult($offset)
-            ->setMaxResults($criteria->itemsPerPage);
-
-        /** @var CityEntity[] $entities */
-        $entities = $qb->getQuery()->getResult();
-
-        return new CityCollection(
-            items: array_map($this->toDomainModel(...), $entities),
-            totalCount: $totalCount,
-        );
+        return $this->knownInseeCodes;
     }
 
-    private function toDomainModel(CityEntity $entity): DomainCity
+    private function formatDateTime(DateTimeInterface $dateTime): string
     {
-        return new DomainCity(
-            inseeCode: $entity->getInseeCode(),
-            name: $entity->getName(),
-            departmentCode: $entity->getDepartmentCode(),
-            regionCode: $entity->getRegionCode(),
-            postalCode: $entity->getPostalCode(),
-            createdAt: $entity->getCreatedAt(),
-            updatedAt: $entity->getUpdatedAt(),
-        );
+        return $dateTime->format('Y-m-d H:i:s');
     }
 }

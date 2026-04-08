@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\City\DTO;
+namespace App\Application\City\DTO;
 
 final readonly class ImportResultDTO
 {
