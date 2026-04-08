@@ -2,6 +2,8 @@
 
 Symfony/API Platform API exposing French city data from the [INSEE API](https://api.insee.fr).
 
+[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/thomaslaure)
+
 ## Features
 
 - Symfony console command to fetch and store city data from the INSEE API
