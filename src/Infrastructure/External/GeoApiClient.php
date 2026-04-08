@@ -129,10 +129,10 @@ final readonly class GeoApiClient implements CityDataProviderInterface
         return $rawCity[$field];
     }
 
-    private function extractPostalCode(mixed $postalCodes, int $index): string
+    private function extractPostalCode(mixed $postalCodes, int $index): ?string
     {
         if (null === $postalCodes) {
-            return '';
+            return null;
         }
 
         if (!is_array($postalCodes)) {
@@ -140,7 +140,7 @@ final readonly class GeoApiClient implements CityDataProviderInterface
         }
 
         if ([] === $postalCodes) {
-            return '';
+            return null;
         }
 
         $firstPostalCode = $postalCodes[0] ?? null;

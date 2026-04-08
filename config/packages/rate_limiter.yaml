@@ -1,0 +1,6 @@
+framework:
+    rate_limiter:
+        api:
+            policy: sliding_window
+            limit: 200
+            interval: '1 minute'

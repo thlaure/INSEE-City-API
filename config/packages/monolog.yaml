@@ -1,0 +1,21 @@
+monolog:
+    channels:
+        - api_access
+
+    handlers:
+        api_access:
+            type: stream
+            path: '%kernel.logs_dir%/api_access.log'
+            level: info
+            channels: ['api_access']
+            formatter: monolog.formatter.json
+
+when@prod:
+    monolog:
+        handlers:
+            api_access:
+                type: stream
+                path: 'php://stdout'
+                level: info
+                channels: ['api_access']
+                formatter: monolog.formatter.json

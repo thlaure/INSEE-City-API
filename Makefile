@@ -1,4 +1,4 @@
-.PHONY: help up down build rebuild clean shell logs lint analyse tests-unit tests-integration tests db-migrate db-reset cache-clear composer-install composer-update grumphp
+.PHONY: help up down build rebuild clean shell logs lint analyse tests-unit tests-integration tests db-migrate db-reset cache-clear composer-install composer-update grumphp security
 
 # Default target
 .DEFAULT_GOAL := help
@@ -80,6 +80,9 @@ rector: ## Run Rector to refactor code
 
 rector-dry: ## Run Rector in dry-run mode
 	docker compose exec app vendor/bin/rector process --dry-run
+
+security: ## Check for known vulnerable dependencies
+	docker compose exec app vendor/bin/security-checker security:check
 
 quality: lint analyse rector ## Run all code quality tools (CS Fixer, PHPStan, Rector)
 

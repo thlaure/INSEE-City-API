@@ -41,7 +41,12 @@ src/
 ├── Domain/City/
 ├── Entity/
 ├── Infrastructure/
+│   ├── External/
+│   ├── Http/Listener/      # ApiRequestLogListener, RateLimitListener
+│   └── Persistence/
 └── UI/
+    ├── Command/
+    └── Controller/         # HealthController
 ```
 
 ## Engineering Rules
@@ -67,9 +72,11 @@ Never:
 - put business logic in controllers or framework entrypoints
 - create duplicated agent instructions across `AGENTS.md` and `CLAUDE.md`
 
-## Search API
+## API
 
-`GET /api/v1/cities` is API Platform native.
+### Search
+
+`GET /api/v1/cities` and `GET /api/v1/cities/{inseeCode}` are API Platform native.
 
 Supported filters:
 
@@ -78,7 +85,21 @@ Supported filters:
 - `departmentCode`: exact match
 - `regionCode`: exact match
 
-`postalCode` must be present in the API output when data exists.
+`postalCode` is `?string` — `null` when no data exists, never an empty string.
+
+### Health
+
+`GET /health` — checks DB connectivity. Returns 200 or 503. Not under `/api/v1`.
+
+### Observability
+
+- Every `/api/` request is logged (channel `api_access`, JSON) with: `request_id`, `consumer`, `method`, `path`, `status`, `ip`, `user_agent`, `duration_ms`.
+- Consumers should send `X-App-Name` header (sanitized, not enforced).
+- `X-Request-Id` is generated if absent and echoed in the response.
+
+### Rate Limiting
+
+200 req/min per IP via `symfony/rate-limiter` (sliding window). Returns `429 application/problem+json`.
 
 ## Quality Gates
 
@@ -90,12 +111,14 @@ Run when relevant:
 - `make tests-unit`
 - `make tests-integration`
 - `make tests-api`
+- `make security`
 
 Preferred full verification:
 
 - `make quality`
 - `make tests`
 - `make tests-api`
+- `make security`
 
 ## Testing Notes
 

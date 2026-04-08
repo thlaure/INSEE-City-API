@@ -30,19 +30,19 @@ final class CityTest extends TestCase
         $this->assertSame('75001', $city->postalCode);
     }
 
-    public function testConstructorAllowsEmptyPostalCode(): void
+    public function testConstructorAllowsNullPostalCode(): void
     {
         $city = new City(
             inseeCode: '01001',
             name: 'L\'Abergement-Clemenciat',
             departmentCode: '01',
             regionCode: '84',
-            postalCode: '',
+            postalCode: null,
             createdAt: new DateTimeImmutable(),
             updatedAt: new DateTimeImmutable(),
         );
 
-        $this->assertSame('', $city->postalCode);
+        $this->assertNull($city->postalCode);
     }
 
     public function testConstructorRejectsEmptyInseeCode(): void
