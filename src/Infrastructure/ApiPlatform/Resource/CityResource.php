@@ -30,8 +30,8 @@ use App\Infrastructure\ApiPlatform\StateProvider\SearchCitiesStateProvider;
             openapi: new OpenApiOperation(
                 summary: 'List French communes',
                 description: 'Returns a paginated Hydra collection of French communes. '
-                    .'All filters are optional and combinable. '
-                    .'Passing a filter parameter with an empty value (e.g. `?name=`) is a validation error — omit the parameter instead.',
+                    . 'All filters are optional and combinable. '
+                    . 'Passing a filter parameter with an empty value (e.g. `?name=`) is a validation error — omit the parameter instead.',
                 parameters: [
                     new OpenApiParameter(
                         name: 'name',

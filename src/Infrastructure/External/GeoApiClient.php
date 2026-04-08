@@ -28,7 +28,7 @@ final readonly class GeoApiClient implements CityDataProviderInterface
     public function fetchAllCities(): array
     {
         try {
-            $response = $this->httpClient->request(Request::METHOD_GET, $this->baseUrl.self::COMMUNES_PATH, [
+            $response = $this->httpClient->request(Request::METHOD_GET, $this->baseUrl . self::COMMUNES_PATH, [
                 'query' => [
                     'fields' => self::FIELDS,
                     'format' => 'json',

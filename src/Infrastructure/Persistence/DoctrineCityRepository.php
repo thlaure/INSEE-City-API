@@ -74,7 +74,7 @@ final readonly class DoctrineCityRepository implements CityRepositoryInterface
 
         if (null !== $criteria->name) {
             $qb->andWhere('LOWER(c.name) LIKE LOWER(:name)')
-                ->setParameter('name', '%'.$criteria->name.'%');
+                ->setParameter('name', '%' . $criteria->name . '%');
         }
 
         if (null !== $criteria->departmentCode) {
