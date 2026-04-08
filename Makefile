@@ -130,7 +130,7 @@ db-test-create: ## Create and migrate the test database (insee_city_test)
 	docker compose exec app php bin/console -e test doctrine:migrations:migrate --no-interaction
 
 psql: ## Open PostgreSQL shell
-	docker compose exec postgres psql -U insee -d insee_city
+	docker compose exec database psql -U insee -d insee_city
 
 ## —— Symfony —————————————————————————————————————————————————————————————————
 
@@ -146,7 +146,7 @@ console: ## Run Symfony console command (usage: make console CMD="cache:clear")
 ## —— INSEE Import ————————————————————————————————————————————————————————————
 
 import: ## Run INSEE city import command
-	docker compose exec app php -d memory_limit=512M bin/console app:import-cities
+	symfony php -d memory_limit=512M bin/console app:import-cities
 
 ## —— API Platform ————————————————————————————————————————————————————————————
 
