@@ -6,15 +6,25 @@ namespace App\Infrastructure\ApiPlatform\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
+use App\Infrastructure\ApiPlatform\StateProvider\GetCityStateProvider;
 use App\Infrastructure\ApiPlatform\StateProvider\SearchCitiesStateProvider;
 
 #[ApiResource(
     shortName: 'City',
     description: 'A French commune (city) from the INSEE/geo.api.gouv.fr dataset.',
     operations: [
+        new Get(
+            uriTemplate: '/cities/{inseeCode}',
+            openapi: new OpenApiOperation(
+                summary: 'Get a single commune by INSEE code',
+                description: 'Returns the commune matching the given INSEE code. Returns 404 if not found.',
+            ),
+            provider: GetCityStateProvider::class,
+        ),
         new GetCollection(
             uriTemplate: '/cities',
             openapi: new OpenApiOperation(
