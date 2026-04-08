@@ -51,6 +51,7 @@ final class GeoApiClientTest extends TestCase
         $this->assertSame('75056', $cities[0]->inseeCode);
         $this->assertSame('Paris', $cities[0]->name);
         $this->assertSame('75001', $cities[0]->postalCode);
+        $this->assertSame('69001', $cities[1]->postalCode);
         $this->assertSame('69123', $cities[1]->inseeCode);
         $this->assertSame('Lyon', $cities[1]->name);
     }

@@ -9,3 +9,8 @@
 
 controllers:
     resource: routing.controllers
+
+health:
+    path: /health
+    controller: App\UI\Controller\HealthController
+    methods: [GET]

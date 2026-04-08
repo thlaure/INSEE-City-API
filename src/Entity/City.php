@@ -19,12 +19,14 @@ use Symfony\Component\Uid\UuidV7;
 #[ApiResource(shortName: 'City', operations: [
     new Get(
         uriTemplate: '/cities/{inseeCode}',
+        cacheHeaders: ['max_age' => 3600, 'public' => true],
     ),
     new GetCollection(
         uriTemplate: '/cities',
+        cacheHeaders: ['max_age' => 3600, 'public' => true],
         paginationEnabled: true,
         paginationItemsPerPage: 30,
-        paginationMaximumItemsPerPage: 100,
+        paginationMaximumItemsPerPage: 1000,
         paginationClientItemsPerPage: true,
         order: ['name' => 'ASC'],
         parameters: [
@@ -106,8 +108,8 @@ class City
         #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10)]
         private string $regionCode,
         #[Groups(['city:read'])]
-        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10)]
-        private string $postalCode = '',
+        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10, nullable: true)]
+        private ?string $postalCode = null,
         #[ORM\Column(type: \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)]
         private DateTimeImmutable $createdAt = new DateTimeImmutable(),
     ) {
@@ -140,7 +142,7 @@ class City
         return $this->regionCode;
     }
 
-    public function getPostalCode(): string
+    public function getPostalCode(): ?string
     {
         return $this->postalCode;
     }
@@ -159,7 +161,7 @@ class City
         string $name,
         string $departmentCode,
         string $regionCode,
-        string $postalCode,
+        ?string $postalCode,
     ): void {
         $this->name = $name;
         $this->departmentCode = $departmentCode;

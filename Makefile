@@ -1,4 +1,4 @@
-.PHONY: help up down build rebuild clean shell logs lint analyse tests-unit tests-integration tests db-migrate db-reset cache-clear composer-install composer-update grumphp
+.PHONY: help up down build rebuild clean shell logs lint analyse tests-unit tests-integration tests db-migrate db-reset db-test-create cache-clear composer-install composer-update grumphp security
 
 # Default target
 .DEFAULT_GOAL := help
@@ -81,6 +81,9 @@ rector: ## Run Rector to refactor code
 rector-dry: ## Run Rector in dry-run mode
 	docker compose exec app vendor/bin/rector process --dry-run
 
+security: ## Check for known vulnerable dependencies
+	docker compose exec app vendor/bin/security-checker security:check
+
 quality: lint analyse rector ## Run all code quality tools (CS Fixer, PHPStan, Rector)
 
 grumphp: ## Run GrumPHP (all pre-commit checks)
@@ -100,7 +103,7 @@ tests: ## Run all tests
 tests-coverage: ## Run unit tests with coverage report (HTML + text)
 	docker compose exec -e XDEBUG_MODE=coverage app vendor/bin/phpunit --testsuite=Unit --coverage-html var/coverage --coverage-text
 
-tests-api: ## Run Behat API tests
+tests-api: db-test-create ## Run Behat API tests (creates/migrates test DB automatically)
 	docker compose exec app vendor/bin/behat --colors
 
 tests-api-wip: ## Run Behat tests tagged @wip
@@ -122,8 +125,12 @@ db-reset: ## Reset database (drop, create, migrate)
 db-fixtures: ## Load database fixtures
 	docker compose exec app php bin/console doctrine:fixtures:load --no-interaction
 
+db-test-create: ## Create and migrate the test database (insee_city_test)
+	docker compose exec app php bin/console -e test doctrine:database:create --if-not-exists
+	docker compose exec app php bin/console -e test doctrine:migrations:migrate --no-interaction
+
 psql: ## Open PostgreSQL shell
-	docker compose exec postgres psql -U insee -d insee_city
+	docker compose exec database psql -U insee -d insee_city
 
 ## —— Symfony —————————————————————————————————————————————————————————————————
 
@@ -139,7 +146,7 @@ console: ## Run Symfony console command (usage: make console CMD="cache:clear")
 ## —— INSEE Import ————————————————————————————————————————————————————————————
 
 import: ## Run INSEE city import command
-	docker compose exec app php -d memory_limit=512M bin/console app:import-cities
+	symfony php -d memory_limit=512M bin/console app:import-cities
 
 ## —— API Platform ————————————————————————————————————————————————————————————
 

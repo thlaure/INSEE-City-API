@@ -16,7 +16,7 @@ final readonly class City
         public string $name,
         public string $departmentCode,
         public string $regionCode,
-        public string $postalCode,
+        public ?string $postalCode,
         public DateTimeImmutable $createdAt,
         public DateTimeImmutable $updatedAt,
     ) {

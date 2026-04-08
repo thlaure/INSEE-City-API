@@ -20,12 +20,12 @@ services:
       - APP_ENV=${APP_ENV:-dev}
       - APP_DEBUG=${APP_DEBUG:-1}
       - APP_SECRET=${APP_SECRET:-changeme}
-      - DATABASE_URL=postgresql://insee:insee@postgres:5432/insee_city?serverVersion=16&charset=utf8
-      - DATABASE_URL_TEST=postgresql://insee:insee@postgres:5432/insee_city_test?serverVersion=16&charset=utf8
+      - DATABASE_URL=postgresql://insee:insee@database:5432/insee_city?serverVersion=16&charset=utf8
+      - DATABASE_URL_TEST=postgresql://insee:insee@database:5432/insee_city_test?serverVersion=16&charset=utf8
       - FRANKENPHP_CONFIG=worker ./public/index.php
       - SERVER_NAME=:80
     depends_on:
-      postgres:
+      database:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
@@ -35,7 +35,7 @@ services:
     networks:
       - insee-city-api
 
-  postgres:
+  database:
     image: postgres:16-alpine
     container_name: insee-city-api-postgres
     restart: unless-stopped
