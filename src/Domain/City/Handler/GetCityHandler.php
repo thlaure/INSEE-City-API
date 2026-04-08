@@ -20,7 +20,7 @@ final readonly class GetCityHandler
     {
         $city = $this->cityRepository->findByInseeCode($query->inseeCode);
 
-        if (!$city instanceof \App\Domain\City\Model\City) {
+        if (!$city instanceof City) {
             throw CityNotFoundException::forInseeCode($query->inseeCode);
         }
 
