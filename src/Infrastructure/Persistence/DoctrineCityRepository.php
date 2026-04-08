@@ -17,7 +17,7 @@ final class DoctrineCityRepository implements CityRepositoryInterface
     /** @var array<string, true>|null */
     private ?array $knownInseeCodes = null;
 
-    private Connection $connection;
+    private readonly Connection $connection;
 
     public function __construct(
         EntityManagerInterface $entityManager,

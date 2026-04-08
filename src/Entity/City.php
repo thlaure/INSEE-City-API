@@ -16,70 +16,66 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\UuidV7;
 
-#[ApiResource(
-    shortName: 'City',
-    normalizationContext: ['groups' => ['city:read']],
-    operations: [
-        new Get(
-            uriTemplate: '/cities/{inseeCode}',
-        ),
-        new GetCollection(
-            uriTemplate: '/cities',
-            paginationEnabled: true,
-            paginationItemsPerPage: 30,
-            paginationMaximumItemsPerPage: 100,
-            paginationClientItemsPerPage: true,
-            order: ['name' => 'ASC'],
-            parameters: [
-                'name' => new QueryParameter(
-                    property: 'name',
-                    filter: new PartialSearchFilter(),
-                    description: 'Partial match on the city name.',
-                    schema: ['type' => 'string'],
-                    castToArray: false,
-                    constraints: [
-                        new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "name" filter must not be blank. Omit the parameter to return all cities.', allowNull: true),
-                        new \Symfony\Component\Validator\Constraints\Length(max: 255),
-                    ],
-                ),
-                'exactName' => new QueryParameter(
-                    key: 'exactName',
-                    property: 'name',
-                    filter: new ExactFilter(),
-                    description: 'Exact match on the city name.',
-                    schema: ['type' => 'string'],
-                    castToArray: false,
-                    constraints: [
-                        new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "exactName" filter must not be blank. Omit the parameter to disable exact-name search.', allowNull: true),
-                        new \Symfony\Component\Validator\Constraints\Length(max: 255),
-                    ],
-                ),
-                'departmentCode' => new QueryParameter(
-                    property: 'departmentCode',
-                    filter: new ExactFilter(),
-                    description: 'Exact match on the department code.',
-                    schema: ['type' => 'string'],
-                    castToArray: false,
-                    constraints: [
-                        new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "departmentCode" filter must not be blank. Omit the parameter to disable this filter.', allowNull: true),
-                        new \Symfony\Component\Validator\Constraints\Length(max: 10),
-                    ],
-                ),
-                'regionCode' => new QueryParameter(
-                    property: 'regionCode',
-                    filter: new ExactFilter(),
-                    description: 'Exact match on the region code.',
-                    schema: ['type' => 'string'],
-                    castToArray: false,
-                    constraints: [
-                        new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "regionCode" filter must not be blank. Omit the parameter to disable this filter.', allowNull: true),
-                        new \Symfony\Component\Validator\Constraints\Length(max: 10),
-                    ],
-                ),
-            ],
-        ),
-    ],
-)]
+#[ApiResource(shortName: 'City', operations: [
+    new Get(
+        uriTemplate: '/cities/{inseeCode}',
+    ),
+    new GetCollection(
+        uriTemplate: '/cities',
+        paginationEnabled: true,
+        paginationItemsPerPage: 30,
+        paginationMaximumItemsPerPage: 100,
+        paginationClientItemsPerPage: true,
+        order: ['name' => 'ASC'],
+        parameters: [
+            'name' => new QueryParameter(
+                schema: ['type' => 'string'],
+                filter: new PartialSearchFilter(),
+                property: 'name',
+                description: 'Partial match on the city name.',
+                constraints: [
+                    new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "name" filter must not be blank. Omit the parameter to return all cities.', allowNull: true),
+                    new \Symfony\Component\Validator\Constraints\Length(max: 255),
+                ],
+                castToArray: false,
+            ),
+            'exactName' => new QueryParameter(
+                key: 'exactName',
+                schema: ['type' => 'string'],
+                filter: new ExactFilter(),
+                property: 'name',
+                description: 'Exact match on the city name.',
+                constraints: [
+                    new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "exactName" filter must not be blank. Omit the parameter to disable exact-name search.', allowNull: true),
+                    new \Symfony\Component\Validator\Constraints\Length(max: 255),
+                ],
+                castToArray: false,
+            ),
+            'departmentCode' => new QueryParameter(
+                schema: ['type' => 'string'],
+                filter: new ExactFilter(),
+                property: 'departmentCode',
+                description: 'Exact match on the department code.',
+                constraints: [
+                    new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "departmentCode" filter must not be blank. Omit the parameter to disable this filter.', allowNull: true),
+                    new \Symfony\Component\Validator\Constraints\Length(max: 10),
+                ],
+                castToArray: false,
+            ),
+            'regionCode' => new QueryParameter(
+                schema: ['type' => 'string'],
+                filter: new ExactFilter(),
+                property: 'regionCode',
+                description: 'Exact match on the region code.',
+                constraints: [
+                    new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "regionCode" filter must not be blank. Omit the parameter to disable this filter.', allowNull: true),
+                    new \Symfony\Component\Validator\Constraints\Length(max: 10),
+                ],
+                castToArray: false,
+            ),
+        ],
+    ),
+], normalizationContext: ['groups' => ['city:read']])]
 #[ORM\Entity]
 #[ORM\Table(name: 'cities')]
 #[ORM\Index(name: 'idx_cities_department_code', columns: ['department_code'])]
@@ -91,10 +87,6 @@ class City
     #[ApiProperty(identifier: false)]
     #[ORM\Column(type: 'uuid', unique: true)]
     private UuidV7 $id;
-
-    #[Groups(['city:read'])]
-    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10)]
-    private string $postalCode = '';
 
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)]
     private DateTimeImmutable $updatedAt;
@@ -113,12 +105,13 @@ class City
         #[Groups(['city:read'])]
         #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10)]
         private string $regionCode,
-        string $postalCode = '',
+        #[Groups(['city:read'])]
+        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10)]
+        private string $postalCode = '',
         #[ORM\Column(type: \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)]
         private DateTimeImmutable $createdAt = new DateTimeImmutable(),
     ) {
         $this->id = new UuidV7();
-        $this->postalCode = $postalCode;
         $this->updatedAt = new DateTimeImmutable();
     }
 

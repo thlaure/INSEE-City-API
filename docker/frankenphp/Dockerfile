@@ -35,12 +35,10 @@ COPY docker/frankenphp/php.prod.ini /usr/local/etc/php/conf.d/app.ini
 COPY docker/frankenphp/Caddyfile.prod /etc/caddy/Caddyfile
 
 # Install dependencies and set permissions
-RUN APP_SECRET=build-secret \
-    DATABASE_URL=postgresql://insee:insee@localhost:5432/insee_city?serverVersion=16&charset=utf8 \
-    composer install --no-dev --prefer-dist --optimize-autoloader --classmap-authoritative --no-interaction --no-scripts \
-    && APP_SECRET=build-secret \
-    DATABASE_URL=postgresql://insee:insee@localhost:5432/insee_city?serverVersion=16&charset=utf8 \
-    php bin/console cache:warmup --env=prod --no-debug \
+RUN export APP_SECRET=build-secret \
+    DATABASE_URL='postgresql://insee:insee@localhost:5432/insee_city?serverVersion=16&charset=utf8' \
+    && composer install --no-dev --prefer-dist --optimize-autoloader --classmap-authoritative --no-interaction --no-scripts \
+    && php bin/console cache:warmup --env=prod --no-debug \
     && chown -R www-data:www-data /app/var
 
 # Expose ports (HTTP/HTTPS/HTTP3)

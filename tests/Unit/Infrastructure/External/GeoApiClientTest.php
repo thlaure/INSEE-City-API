@@ -19,11 +19,11 @@ final class GeoApiClientTest extends TestCase
     {
         $client = new GeoApiClient(
             new MockHttpClient([
-                new MockResponse((string) json_encode([
+                new MockResponse(json_encode([
                     ['code' => '75'],
                     ['code' => '69'],
                 ], JSON_THROW_ON_ERROR)),
-                new MockResponse((string) json_encode([
+                new MockResponse(json_encode([
                     [
                         'code' => '75056',
                         'nom' => 'Paris',
@@ -32,7 +32,7 @@ final class GeoApiClientTest extends TestCase
                         'codesPostaux' => ['75001'],
                     ],
                 ], JSON_THROW_ON_ERROR)),
-                new MockResponse((string) json_encode([
+                new MockResponse(json_encode([
                     [
                         'code' => '69123',
                         'nom' => 'Lyon',
@@ -59,10 +59,10 @@ final class GeoApiClientTest extends TestCase
     {
         $client = new GeoApiClient(
             new MockHttpClient([
-                new MockResponse((string) json_encode([
+                new MockResponse(json_encode([
                     ['code' => '75'],
                 ], JSON_THROW_ON_ERROR)),
-                new MockResponse((string) json_encode([
+                new MockResponse(json_encode([
                     [
                         'nom' => 'Paris',
                         'codeDepartement' => '75',
@@ -84,7 +84,7 @@ final class GeoApiClientTest extends TestCase
     {
         $client = new GeoApiClient(
             new MockHttpClient([
-                new MockResponse((string) json_encode([
+                new MockResponse(json_encode([
                     ['name' => 'Paris'],
                 ], JSON_THROW_ON_ERROR)),
             ]),
