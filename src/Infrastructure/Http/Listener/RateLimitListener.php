@@ -11,12 +11,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 #[AsEventListener(event: KernelEvents::REQUEST, method: 'onRequest', priority: 20)]
 final readonly class RateLimitListener
 {
-    public function __construct(private RateLimiterFactory $apiLimiter)
+    public function __construct(private RateLimiterFactoryInterface $apiLimiter)
     {
     }
 
