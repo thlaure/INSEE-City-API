@@ -11,9 +11,9 @@ services:
       - "4444:443/udp"
     volumes:
       - .:/app:cached
-      - ./docker/frankenphp/php.ini:/usr/local/etc/php/conf.d/app.ini:ro
+      - ./docker/frankenphp/php.dev.ini:/usr/local/etc/php/conf.d/app.ini:ro
       - ./docker/frankenphp/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini:ro
-      - ./docker/frankenphp/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./docker/frankenphp/Caddyfile.dev:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     environment:

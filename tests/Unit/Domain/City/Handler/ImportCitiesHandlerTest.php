@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\City\Handler;
 
+use App\Application\City\Handler\ImportCitiesHandler;
 use App\Domain\City\Exception\CityDataProviderException;
-use App\Domain\City\Handler\ImportCitiesHandler;
+use App\Domain\City\Model\City;
 use App\Domain\City\Port\CityDataProviderInterface;
 use App\Domain\City\Port\CityRepositoryInterface;
+use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+
+use function sprintf;
 
 final class ImportCitiesHandlerTest extends TestCase
 {
@@ -45,14 +49,14 @@ final class ImportCitiesHandlerTest extends TestCase
 
     public function testInvokeCreatesNewCitiesAndReturnsCounts(): void
     {
-        $raw = [
-            ['code' => '75056', 'nom' => 'Paris', 'codeDepartement' => '75', 'codeRegion' => '11', 'codesPostaux' => ['75001']],
-            ['code' => '69123', 'nom' => 'Lyon', 'codeDepartement' => '69', 'codeRegion' => '84', 'codesPostaux' => ['69001']],
+        $cities = [
+            $this->makeCity('75056', 'Paris', '75', '11', '75001'),
+            $this->makeCity('69123', 'Lyon', '69', '84', '69001'),
         ];
 
         $this->dataProvider->expects($this->once())
             ->method('fetchAllCities')
-            ->willReturn($raw);
+            ->willReturn($cities);
 
         $this->cityRepository->expects($this->exactly(2))
             ->method('save')
@@ -67,13 +71,13 @@ final class ImportCitiesHandlerTest extends TestCase
 
     public function testInvokeUpdatesExistingCitiesAndReturnsCounts(): void
     {
-        $raw = [
-            ['code' => '75056', 'nom' => 'Paris', 'codeDepartement' => '75', 'codeRegion' => '11', 'codesPostaux' => ['75001']],
+        $cities = [
+            $this->makeCity('75056', 'Paris', '75', '11', '75001'),
         ];
 
         $this->dataProvider->expects($this->once())
             ->method('fetchAllCities')
-            ->willReturn($raw);
+            ->willReturn($cities);
 
         $this->cityRepository->expects($this->once())
             ->method('save')
@@ -88,11 +92,15 @@ final class ImportCitiesHandlerTest extends TestCase
 
     public function testInvokeFlushesEvery50Cities(): void
     {
-        $raw = array_fill(0, 100, ['code' => '75056', 'nom' => 'Paris', 'codeDepartement' => '75', 'codeRegion' => '11', 'codesPostaux' => []]);
+        $cities = [];
+
+        for ($i = 0; $i < 100; ++$i) {
+            $cities[] = $this->makeCity(sprintf('75%03d', $i), sprintf('Paris %d', $i), '75', '11', '');
+        }
 
         $this->dataProvider->expects($this->once())
             ->method('fetchAllCities')
-            ->willReturn($raw);
+            ->willReturn($cities);
 
         $this->cityRepository->expects($this->any())
             ->method('save')
@@ -114,5 +122,23 @@ final class ImportCitiesHandlerTest extends TestCase
         $this->expectException(CityDataProviderException::class);
 
         ($this->handler)();
+    }
+
+    private function makeCity(
+        string $inseeCode,
+        string $name,
+        string $departmentCode,
+        string $regionCode,
+        string $postalCode,
+    ): City {
+        return new City(
+            inseeCode: $inseeCode,
+            name: $name,
+            departmentCode: $departmentCode,
+            regionCode: $regionCode,
+            postalCode: $postalCode,
+            createdAt: new DateTimeImmutable(),
+            updatedAt: new DateTimeImmutable(),
+        );
     }
 }

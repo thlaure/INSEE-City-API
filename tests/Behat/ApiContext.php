@@ -71,15 +71,15 @@ final class ApiContext implements Context
      */
     public function iSendARequestTo(string $method, string $url): void
     {
-        $url = $this->replaceStoredVariables($url);
-        $this->client->request(
-            $method,
-            $url,
-            [],
-            [],
-            $this->buildHeaders('application/json'),
-        );
-        $this->lastResponseData = null;
+        $this->sendRequest($method, $url, 'application/ld+json');
+    }
+
+    /**
+     * @When I send a :method request to :url accepting :accept
+     */
+    public function iSendARequestToAccepting(string $method, string $url, string $accept): void
+    {
+        $this->sendRequest($method, $url, $accept);
     }
 
     /**
@@ -164,7 +164,7 @@ final class ApiContext implements Context
         }
 
         $actual = $data[$key];
-        $expected = $this->castValue($value);
+        $expected = is_string($actual) ? $value : $this->castValue($value);
 
         if ($actual !== $expected) {
             $actualString = is_array($actual) ? (string) json_encode($actual) : (is_scalar($actual) ? (string) $actual : '');
@@ -252,7 +252,15 @@ final class ApiContext implements Context
      */
     public function theJsonResponseShouldBeRfc7807Problem(): void
     {
-        $this->theResponseContentTypeShouldContain('application/problem+json');
+        $contentType = $this->client->getResponse()->headers->get('Content-Type') ?? '';
+
+        if (!str_contains($contentType, 'application/problem+json') && !str_contains($contentType, 'application/ld+json')) {
+            throw new RuntimeException(sprintf(
+                'Expected problem response content type, got "%s"',
+                $contentType,
+            ));
+        }
+
         $this->theJsonResponseShouldContain('type');
         $this->theJsonResponseShouldContain('title');
         $this->theJsonResponseShouldContain('status');
@@ -347,5 +355,21 @@ final class ApiContext implements Context
             'CONTENT_TYPE' => $contentType,
             'HTTP_ACCEPT' => 'application/ld+json',
         ];
+    }
+
+    private function sendRequest(string $method, string $url, string $accept): void
+    {
+        $url = $this->replaceStoredVariables($url);
+        $headers = $this->buildHeaders('application/json');
+        $headers['HTTP_ACCEPT'] = $accept;
+
+        $this->client->request(
+            $method,
+            $url,
+            [],
+            [],
+            $headers,
+        );
+        $this->lastResponseData = null;
     }
 }

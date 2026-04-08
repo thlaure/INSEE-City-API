@@ -139,7 +139,7 @@ console: ## Run Symfony console command (usage: make console CMD="cache:clear")
 ## —— INSEE Import ————————————————————————————————————————————————————————————
 
 import: ## Run INSEE city import command
-	docker compose exec app php bin/console app:import-cities
+	docker compose exec app php -d memory_limit=512M bin/console app:import-cities
 
 ## —— API Platform ————————————————————————————————————————————————————————————
 

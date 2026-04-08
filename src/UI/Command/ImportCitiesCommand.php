@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\UI\Command;
 
+use App\Application\City\Handler\ImportCitiesHandler;
 use App\Domain\City\Exception\CityDataProviderException;
-use App\Domain\City\Handler\ImportCitiesHandler;
 
 use function sprintf;
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Persistence;
 
 use App\Domain\City\Model\City;
-use App\Domain\City\Model\CitySearchCriteria;
 use App\Infrastructure\Persistence\DoctrineCityRepository;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTimeImmutable;
@@ -28,9 +27,9 @@ final class DoctrineCityRepositoryTest extends DatabaseTestCase
         $this->repository->flush();
 
         $this->assertTrue($isNew);
-        $found = $this->repository->findByInseeCode('75056');
-        $this->assertNotNull($found);
-        $this->assertSame('Paris', $found->name);
+        $entity = $this->entityManager->getRepository(\App\Entity\City::class)->findOneBy(['inseeCode' => '75056']);
+        $this->assertInstanceOf(\App\Entity\City::class, $entity);
+        $this->assertSame('Paris', $entity->getName());
     }
 
     public function testSaveUpdatesExistingCityAndReturnsFalse(): void
@@ -44,88 +43,29 @@ final class DoctrineCityRepositoryTest extends DatabaseTestCase
         $this->repository->flush();
 
         $this->assertFalse($isNew);
-        $found = $this->repository->findByInseeCode('75056');
-        $this->assertNotNull($found);
-        $this->assertSame('Paris Updated', $found->name);
+        $entity = $this->entityManager->getRepository(\App\Entity\City::class)->findOneBy(['inseeCode' => '75056']);
+        $this->assertInstanceOf(\App\Entity\City::class, $entity);
+        $this->assertSame('Paris Updated', $entity->getName());
     }
 
-    public function testFindByInseeCodeReturnsNullForUnknownCode(): void
+    public function testSavePersistsPostalCode(): void
     {
-        $this->assertNull($this->repository->findByInseeCode('99999'));
-    }
-
-    public function testFindByCriteriaWithNoFiltersReturnsPaginatedResults(): void
-    {
-        $this->repository->save($this->makeCity('75056', 'Paris', '75', '11'));
-        $this->repository->save($this->makeCity('69123', 'Lyon', '69', '84'));
+        $this->repository->save($this->makeCity('75056', 'Paris', '75', '11', '75001'));
         $this->repository->flush();
 
-        $collection = $this->repository->findByCriteria(new CitySearchCriteria());
-
-        $this->assertSame(2, $collection->getTotalCount());
-        $this->assertCount(2, $collection->getItems());
+        $entity = $this->entityManager->getRepository(\App\Entity\City::class)->findOneBy(['inseeCode' => '75056']);
+        $this->assertInstanceOf(\App\Entity\City::class, $entity);
+        $this->assertSame('75001', $entity->getPostalCode());
     }
 
-    public function testFindByCriteriaFiltersByName(): void
-    {
-        $this->repository->save($this->makeCity('75056', 'Paris', '75', '11'));
-        $this->repository->save($this->makeCity('69123', 'Lyon', '69', '84'));
-        $this->repository->flush();
-
-        $collection = $this->repository->findByCriteria(new CitySearchCriteria(name: 'par'));
-
-        $this->assertSame(1, $collection->getTotalCount());
-        $this->assertSame('Paris', $collection->getItems()[0]->name);
-    }
-
-    public function testFindByCriteriaFiltersByDepartmentCode(): void
-    {
-        $this->repository->save($this->makeCity('75056', 'Paris', '75', '11'));
-        $this->repository->save($this->makeCity('75008', 'Paris 8e', '75', '11'));
-        $this->repository->save($this->makeCity('69123', 'Lyon', '69', '84'));
-        $this->repository->flush();
-
-        $collection = $this->repository->findByCriteria(new CitySearchCriteria(departmentCode: '75'));
-
-        $this->assertSame(2, $collection->getTotalCount());
-    }
-
-    public function testFindByCriteriaFiltersByRegionCode(): void
-    {
-        $this->repository->save($this->makeCity('75056', 'Paris', '75', '11'));
-        $this->repository->save($this->makeCity('69123', 'Lyon', '69', '84'));
-        $this->repository->flush();
-
-        $collection = $this->repository->findByCriteria(new CitySearchCriteria(regionCode: '84'));
-
-        $this->assertSame(1, $collection->getTotalCount());
-        $this->assertSame('Lyon', $collection->getItems()[0]->name);
-    }
-
-    public function testFindByCriteriaPaginates(): void
-    {
-        for ($i = 1; $i <= 5; ++$i) {
-            $this->repository->save($this->makeCity("0000{$i}", "City {$i}", '01', '84'));
-        }
-
-        $this->repository->flush();
-
-        $page1 = $this->repository->findByCriteria(new CitySearchCriteria(page: 1, itemsPerPage: 2));
-        $page2 = $this->repository->findByCriteria(new CitySearchCriteria(page: 2, itemsPerPage: 2));
-
-        $this->assertSame(5, $page1->getTotalCount());
-        $this->assertCount(2, $page1->getItems());
-        $this->assertCount(2, $page2->getItems());
-    }
-
-    private function makeCity(string $inseeCode, string $name, string $dept, string $region): City
+    private function makeCity(string $inseeCode, string $name, string $dept, string $region, string $postalCode = ''): City
     {
         return new City(
             inseeCode: $inseeCode,
             name: $name,
             departmentCode: $dept,
             regionCode: $region,
-            postalCode: '',
+            postalCode: $postalCode,
             createdAt: new DateTimeImmutable(),
             updatedAt: new DateTimeImmutable(),
         );

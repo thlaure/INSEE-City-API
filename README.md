@@ -1,104 +1,130 @@
 # INSEE City API
 
-Symfony/API Platform API exposing French city data from the [INSEE API](https://api.insee.fr).
+Symfony/API Platform API exposing French city data from the French commune dataset at [geo.api.gouv.fr](https://geo.api.gouv.fr).
 
-[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/thomaslaure)
+## Overview
 
-## Features
+The project has two distinct concerns:
 
-- Symfony console command to fetch and store city data from the INSEE API
-- Re-running the command incrementally updates the database with new data
-- `GET /api/v1/cities` endpoint with search filters (name, department, region, etc.)
-- RFC 7807 compliant error responses
+- write/import flow: fetch commune data from the external API and persist it into PostgreSQL
+- read API: expose city search and lookup through API Platform
 
-## Tech Stack
+The write side keeps an explicit `Application` + `Domain` split.
+The read side is intentionally more API Platform native: `App\Entity\City` is the API resource and collection filtering uses API Platform Doctrine filters directly.
 
-- **PHP 8.5** · **Symfony 7.4** · **API Platform 4.x**
-- **FrankenPHP** (Caddy-based, worker mode)
-- **PostgreSQL 16**
-- **Docker** (isolated dev environment)
+## Stack
 
-## Requirements
-
-- Docker + Docker Compose
+- PHP 8.5
+- Symfony 7.4
+- API Platform 4.x
+- PostgreSQL 16
+- FrankenPHP
+- Docker / Docker Compose
+- PHPUnit, Behat, PHPStan, PHP CS Fixer, Rector
 
 ## Quick Start
 
 ```bash
 make install
+make import
 ```
 
-The API will be available at **http://localhost:8001/api/v1**.
+API entrypoint:
 
-> **Port note:** ports `8001` and `5433` are used to avoid conflicts with other local services (Signalist on `8000`, local PostgreSQL on `5432`).
+- `http://localhost:8001/api/v1`
 
-## Available Commands
+Useful local ports:
+
+- app: `8001`
+- postgres: `5433`
+
+## Main Commands
 
 ```bash
-make up             # Start containers
-make down           # Stop containers
-make shell          # Enter app container shell
-make install        # Full setup: build + start + composer install + migrations
+make up
+make down
+make build
+make install
 
-make lint           # PHP CS Fixer
-make analyse        # PHPStan (level 9)
-make rector         # Rector refactoring
-make quality        # All of the above
+make lint
+make analyse
+make rector
+make quality
 
-make tests-unit     # PHPUnit unit tests
-make tests-api      # Behat API tests
-make tests          # All PHPUnit tests
-make grumphp        # Full pre-commit gate
+make tests-unit
+make tests-integration
+make tests-api
+make tests
 
-make db-migrate     # Run migrations
-make db-reset       # Drop + recreate + migrate
-make import         # Run INSEE city import command
-
-make help           # List all commands
+make db-migrate
+make db-reset
+make import
 ```
 
 ## Architecture
 
-Hexagonal Architecture + CQRS:
-
-```
+```text
 src/
-├── Domain/City/          # Business logic (Commands, Queries, Handlers, Models)
-├── Infrastructure/       # Adapters (Doctrine repositories, INSEE API client)
-├── UI/                   # Controllers, Symfony console commands
-└── Entity/               # Doctrine entities
+├── Application/
+│   └── City/
+│       ├── DTO/
+│       └── Handler/
+├── Domain/
+│   └── City/
+│       ├── Exception/
+│       ├── Model/
+│       └── Port/
+├── Entity/
+│   └── City.php            # Doctrine entity + API Platform read resource
+├── Infrastructure/
+│   ├── External/
+│   └── Persistence/
+└── UI/
+    └── Command/
 ```
 
-API routes are prefixed with `/api/v1/`.
+### Read Side
 
-## Development
+`GET /api/v1/cities` and `GET /api/v1/cities/{inseeCode}` are API Platform native and backed directly by `App\Entity\City`.
 
-### DevContainer (recommended)
+Supported collection filters:
 
-Open the project in VS Code and select **Reopen in Container**. The devcontainer uses Docker-in-Docker to run the full stack in isolation — no port conflicts with host services.
+- `name`: partial match
+- `exactName`: exact match
+- `departmentCode`: exact match
+- `regionCode`: exact match
 
-### Code Quality
+`postalCode` is included in the API response.
+Errors support RFC 7807 problem details via `application/problem+json`.
+
+### Write Side
+
+The import command still follows the layered application flow:
+
+`UI Command -> Application Handler -> Domain Model -> Domain Port -> Infrastructure Adapter`
+
+## Import Notes
+
+To populate the database:
 
 ```bash
-make quality    # CS Fixer + PHPStan + Rector
-make grumphp    # Full pre-commit check (also runs tests)
+make import
 ```
 
-### Database
+The import now runs with a higher CLI memory limit by default and fetches communes department by department to avoid loading the full French dataset into memory in one shot.
+
+## Quality
 
 ```bash
-make db-diff    # Generate a migration from entity changes
-make db-migrate # Apply pending migrations
-make psql       # Open a PostgreSQL shell
+make quality
+make tests
+make tests-api
 ```
 
-## CI
+CI runs PHPUnit, Behat, coverage checks, PHPStan, PHP CS Fixer, Rector, YAML lint, security scans, and Docker linting.
 
-GitHub Actions runs on every push and pull request to `main`:
+## Agent Docs
 
-| Job | Checks |
-|-----|--------|
-| **Tests** | PHPUnit, Behat, coverage ≥ 80%, CS Fixer, PHPStan, Rector, YAML lint, Doctrine schema |
-| **Secret Scan** | TruffleHog |
-| **Trivy** | CVE scan on prod image + filesystem misconfigurations (CRITICAL/HIGH, unfixed only) |
-| **Docker Lint** | Hadolint on both Dockerfiles |
+Project-specific agent instructions live in [`AGENTS.md`](/Users/thomaslaure/Documents/projects/insee-city-api/AGENTS.md).
+
+`CLAUDE.md` is intentionally only a pointer to `AGENTS.md` so Codex and Claude share one canonical instruction file.

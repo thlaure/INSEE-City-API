@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Domain\City\Model;
 
 use DateTimeImmutable;
+use InvalidArgumentException;
 
-use function is_array;
-use function is_string;
+use function trim;
 
 final readonly class City
 {
@@ -20,29 +20,20 @@ final readonly class City
         public DateTimeImmutable $createdAt,
         public DateTimeImmutable $updatedAt,
     ) {
-    }
+        if ('' === trim($inseeCode)) {
+            throw new InvalidArgumentException('City INSEE code must not be empty.');
+        }
 
-    /**
-     * @param array<string, mixed> $raw
-     */
-    public static function fromGeoApiData(array $raw): self
-    {
-        $now = new DateTimeImmutable();
-        $code = $raw['code'] ?? '';
-        $nom = $raw['nom'] ?? '';
-        $dept = $raw['codeDepartement'] ?? '';
-        $region = $raw['codeRegion'] ?? '';
-        $postalCodes = $raw['codesPostaux'] ?? [];
-        $firstPostalCode = is_array($postalCodes) && [] !== $postalCodes ? $postalCodes[0] : '';
+        if ('' === trim($name)) {
+            throw new InvalidArgumentException('City name must not be empty.');
+        }
 
-        return new self(
-            inseeCode: is_string($code) ? $code : '',
-            name: is_string($nom) ? $nom : '',
-            departmentCode: is_string($dept) ? $dept : '',
-            regionCode: is_string($region) ? $region : '',
-            postalCode: is_string($firstPostalCode) ? $firstPostalCode : '',
-            createdAt: $now,
-            updatedAt: $now,
-        );
+        if ('' === trim($departmentCode)) {
+            throw new InvalidArgumentException('City department code must not be empty.');
+        }
+
+        if ('' === trim($regionCode)) {
+            throw new InvalidArgumentException('City region code must not be empty.');
+        }
     }
 }
