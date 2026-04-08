@@ -6,6 +6,8 @@ namespace App\Infrastructure\Http\Listener;
 
 use function bin2hex;
 use function hrtime;
+use function is_int;
+use function is_string;
 use function preg_replace;
 
 use Psr\Log\LoggerInterface;
@@ -57,11 +59,12 @@ final class ApiRequestLogListener
         }
 
         $response = $event->getResponse();
-        $requestId = $request->attributes->get('_request_id', '');
+        $raw = $request->attributes->get('_request_id');
+        $requestId = is_string($raw) ? $raw : '';
         $response->headers->set('X-Request-Id', $requestId);
 
         $startTime = $request->attributes->get('_api_log_start');
-        $durationMs = $startTime !== null
+        $durationMs = is_int($startTime)
             ? (int) round((hrtime(true) - $startTime) / 1_000_000)
             : null;
 
