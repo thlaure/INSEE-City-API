@@ -24,7 +24,7 @@ final class Version20260408150000 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->addSql("UPDATE cities SET postal_code = '' WHERE postal_code IS NULL");
-        $this->addSql("ALTER TABLE cities ALTER COLUMN postal_code SET NOT NULL");
+        $this->addSql('ALTER TABLE cities ALTER COLUMN postal_code SET NOT NULL');
         $this->addSql("ALTER TABLE cities ALTER COLUMN postal_code SET DEFAULT ''");
     }
 }

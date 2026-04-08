@@ -7,12 +7,14 @@ namespace App\Infrastructure\Http\Listener;
 use function bin2hex;
 use function hrtime;
 use function preg_replace;
+
+use Psr\Log\LoggerInterface;
+
 use function random_bytes;
 use function round;
 use function str_starts_with;
 use function substr;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
