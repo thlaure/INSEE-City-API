@@ -14,9 +14,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 
 #[AsEventListener(event: KernelEvents::REQUEST, method: 'onRequest', priority: 20)]
-final class RateLimitListener
+final readonly class RateLimitListener
 {
-    public function __construct(private readonly RateLimiterFactory $apiLimiter)
+    public function __construct(private RateLimiterFactory $apiLimiter)
     {
     }
 

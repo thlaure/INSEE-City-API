@@ -23,11 +23,11 @@ use Symfony\Component\Uid\UuidV7;
     ),
     new GetCollection(
         uriTemplate: '/cities',
+        cacheHeaders: ['max_age' => 3600, 'public' => true],
         paginationEnabled: true,
         paginationItemsPerPage: 30,
         paginationMaximumItemsPerPage: 1000,
         paginationClientItemsPerPage: true,
-        cacheHeaders: ['max_age' => 3600, 'public' => true],
         order: ['name' => 'ASC'],
         parameters: [
             'name' => new QueryParameter(

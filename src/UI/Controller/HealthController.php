@@ -8,9 +8,9 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Throwable;
 
-final class HealthController
+final readonly class HealthController
 {
-    public function __construct(private readonly Connection $connection)
+    public function __construct(private Connection $connection)
     {
     }
 
@@ -19,7 +19,7 @@ final class HealthController
         try {
             $this->connection->executeQuery('SELECT 1');
         } catch (Throwable) {
-            return new JsonResponse(['status' => 'error', 'detail' => 'Database unavailable'], 503);
+            return new JsonResponse(['status' => 'error', 'detail' => 'Database unavailable'], \Symfony\Component\HttpFoundation\Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         return new JsonResponse(['status' => 'ok']);

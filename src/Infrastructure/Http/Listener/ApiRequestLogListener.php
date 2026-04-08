@@ -25,11 +25,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 #[AsEventListener(event: KernelEvents::REQUEST, method: 'onRequest', priority: 10)]
 #[AsEventListener(event: KernelEvents::RESPONSE, method: 'onResponse')]
-final class ApiRequestLogListener
+final readonly class ApiRequestLogListener
 {
     public function __construct(
         #[Autowire(service: 'monolog.logger.api_access')]
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -69,7 +69,7 @@ final class ApiRequestLogListener
             : null;
 
         $rawConsumer = $request->headers->get('X-App-Name', 'anonymous');
-        $consumer = preg_replace('/[^a-zA-Z0-9_-]/', '', substr($rawConsumer, 0, 64)) ?: 'anonymous';
+        $consumer = preg_replace('/[^a-zA-Z0-9_-]/', '', substr((string) $rawConsumer, 0, 64)) ?: 'anonymous';
 
         $this->logger->info('api.request', [
             'request_id' => $requestId,
