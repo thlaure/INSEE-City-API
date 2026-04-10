@@ -8,8 +8,8 @@ use function array_key_exists;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Gherkin\Node\TableNode;
 use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\TableNode;
 
 use function count;
 
@@ -377,6 +377,8 @@ final class ApiContext implements Context
     }
 
     /**
+     * @param array<string, string> $headers
+     *
      * @return array<string, string>
      */
     private function buildHeaders(string $contentType, array $headers = []): array
@@ -415,6 +417,10 @@ final class ApiContext implements Context
         $headers = [];
 
         foreach ($table->getRowsHash() as $name => $value) {
+            if (!is_string($value)) {
+                throw new RuntimeException(sprintf('Header "%s" value must be a string.', $name));
+            }
+
             $normalized = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
             $headers[$normalized] = $this->replaceStoredVariables($value);
         }
