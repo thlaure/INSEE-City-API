@@ -11,6 +11,13 @@ Feature: City API
     And the JSON collection should be empty
     And the response content type should contain "application/ld+json"
 
+  Scenario: GET /health returns ok when the database is reachable
+    Given there are no cities in the database
+    When I send a "GET" request to "/health" accepting "application/json"
+    Then the response status code should be 200
+    And the response should be JSON
+    And the JSON response "status" should equal "ok"
+
   Scenario: GET /api/v1/cities returns all cities
     Given the following cities exist:
       | inseeCode | name  | departmentCode | regionCode | postalCode |
@@ -78,6 +85,22 @@ Feature: City API
     When I send a "GET" request to "/api/v1/cities?exactName="
     Then the response status code should be 422
     And the response should be JSON
+    And the JSON response should be a RFC 7807 problem
+
+  Scenario: GET /api/v1/cities echoes X-Request-Id
+    Given there are no cities in the database
+    When I send a "GET" request to "/api/v1/cities" with headers:
+      | X-Request-Id | test-request-id-123 |
+    Then the response status code should be 200
+    And the response header "X-Request-Id" should equal "test-request-id-123"
+
+  Scenario: GET /api/v1/cities is rate limited
+    Given there are no cities in the database
+    When I send a "GET" request to "/api/v1/cities"
+    And I send a "GET" request to "/api/v1/cities"
+    Then the response status code should be 429
+    And the response should be JSON
+    And the response content type should contain "application/problem+json"
     And the JSON response should be a RFC 7807 problem
 
   Scenario: GET /api/v1/cities/{inseeCode} returns a single city

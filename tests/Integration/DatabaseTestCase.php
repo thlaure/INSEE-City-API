@@ -17,10 +17,11 @@ abstract class DatabaseTestCase extends KernelTestCase
         self::bootKernel();
 
         $this->entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $this->entityManager->getConnection()->executeStatement('DROP SCHEMA public CASCADE');
+        $this->entityManager->getConnection()->executeStatement('CREATE SCHEMA public');
 
         $schemaTool = new SchemaTool($this->entityManager);
         $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool->dropSchema($metadata);
         $schemaTool->createSchema($metadata);
     }
 

@@ -123,7 +123,10 @@ Errors use RFC 7807 `application/problem+json`.
 
 ### Caching
 
-All responses include `Cache-Control: public, max-age=3600`. Reverse proxies and clients can cache responses for up to one hour.
+Cache behavior depends on the environment:
+
+- `dev`: responses are not cacheable (`Cache-Control: no-store`)
+- `prod`: responses are public cacheable for up to one hour (`Cache-Control: public, max-age=3600`)
 
 ### Rate Limiting
 
