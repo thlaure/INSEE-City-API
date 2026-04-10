@@ -58,19 +58,83 @@ Always:
 - write tests for behavior changes
 - run verification after changes
 - preserve API version prefix `/api/v1`
+- prefer readability and reviewability over premature optimization
+- if API Platform already provides a clean built-in solution, use it instead of adding unnecessary layers
+- prefer fixing PHPStan issues in code, types, or PHPDoc instead of changing `phpstan.neon`
 
 Ask first:
 
 - adding composer packages
 - changing PostgreSQL schema
 - changing the external city data source strategy
+- changing `phpstan.neon`
+- running `git commit`
+- running `git push`
 
 Never:
 
-- commit directly to `master` or `main`
+- commit directly to `master`, `main`, or `develop`
 - hardcode secrets
 - put business logic in controllers or framework entrypoints
 - create duplicated agent instructions across `AGENTS.md` and `CLAUDE.md`
+- run `git commit` or `git push` silently; always ask for confirmation in the current conversation first
+
+## Shared `.claude` Assets
+
+Claude and Codex must both use the repo-local `.claude/` folder as shared operational guidance.
+
+Use these files as the common behavior layer:
+
+- `.claude/settings.json`
+- `.claude/rules/architecture.md`
+- `.claude/rules/testing.md`
+- `.claude/rules/security.md`
+- `.claude/patterns.md`
+
+Use the matching workflow when the task fits:
+
+- scan or inspect repository work: `.claude/skills/scan-project/SKILL.md` or `.claude/commands/symfony/scan-project.md`
+- new functionality: `.claude/skills/new-feature/SKILL.md` or `.claude/commands/symfony/new-feature.md`
+- bug fixing: `.claude/skills/bug-fix/SKILL.md` or `.claude/commands/symfony/bug-fix.md`
+- general review: `.claude/skills/review-change/SKILL.md` or `.claude/commands/symfony/review-change.md`
+- security review: `.claude/skills/security-review/SKILL.md` or `.claude/commands/symfony/security-review.md`
+- verification and checks: `.claude/skills/verify-quality/SKILL.md` or `.claude/commands/symfony/verify-quality.md`
+- commit preparation: `.claude/skills/prepare-commit/SKILL.md` or `.claude/commands/symfony/prepare-commit.md`
+- instruction improvement: `.claude/skills/improve-instructions/SKILL.md` or `.claude/commands/symfony/improve-instructions.md`
+
+Guidance:
+
+- skills and commands are two interfaces for the same workflows; do not let them drift
+- prefer skills when the user is speaking naturally
+- prefer commands when the user explicitly invokes a named workflow
+- rules and patterns are the shared source of truth behind both interfaces
+- `.claude/settings.json` is the versioned repository-default settings file for both Claude and Codex
+- `.claude/settings.local.json` is only for optional local overrides and must not be treated as the shared team standard
+
+## Instructions Improvement Policy
+
+Instruction files are living documentation and should improve with the project and environment, but only through an explicit proposal-and-confirmation workflow.
+
+Files in scope:
+
+- `AGENTS.md`
+- `CLAUDE.md`
+- `.claude/rules/*.md`
+- `.claude/patterns.md`
+- `.claude/commands/symfony/*.md`
+- `.claude/skills/*/SKILL.md`
+
+Policy:
+
+- instructions may be improved when there is durable evidence of drift
+- examples of drift:
+  - repeated corrections or reviewer comments
+  - `Makefile`, `composer.json`, or repo-structure changes
+  - architecture or testing conventions that changed in practice
+  - duplicated or conflicting guidance
+- only reusable, stable guidance should be added
+- temporary context, one-off fixes, and local anecdotes should not be added to instruction files
+- changes to instruction files must be proposed first and applied only after explicit confirmation in the current conversation
 
 ## API
 
