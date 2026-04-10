@@ -1,6 +1,6 @@
 # Claude Guide
 
-Source of truth: see [`AGENTS.md`](/Users/thomaslaure/Documents/projects/insee-city-api/AGENTS.md).
+Source of truth: see `AGENTS.md`.
 
 Claude-specific policy for this repository:
 
