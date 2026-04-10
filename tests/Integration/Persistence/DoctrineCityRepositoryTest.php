@@ -58,7 +58,7 @@ final class DoctrineCityRepositoryTest extends DatabaseTestCase
         $this->assertSame('75001', $entity->getPostalCode());
     }
 
-    private function makeCity(string $inseeCode, string $name, string $dept, string $region, string $postalCode = ''): City
+    private function makeCity(string $inseeCode, string $name, string $dept, string $region, ?string $postalCode = null): City
     {
         return new City(
             inseeCode: $inseeCode,

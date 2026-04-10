@@ -6,8 +6,10 @@ namespace App\UI\Controller;
 
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Throwable;
 
+#[AsController]
 final readonly class HealthController
 {
     public function __construct(private Connection $connection)

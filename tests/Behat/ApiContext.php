@@ -9,6 +9,7 @@ use function array_key_exists;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\TableNode;
 
 use function count;
 
@@ -28,6 +29,7 @@ use const JSON_ERROR_NONE;
 use function json_last_error;
 use function preg_match;
 use function preg_replace_callback;
+use function random_int;
 
 use RuntimeException;
 
@@ -43,6 +45,8 @@ final class ApiContext implements Context
 
     /** @var array<string, string> */
     private array $storedVariables = [];
+
+    private string $scenarioClientIp = '127.0.0.1';
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -64,6 +68,7 @@ final class ApiContext implements Context
         $this->entityManager->clear();
         $this->storedVariables = [];
         $this->lastResponseData = null;
+        $this->scenarioClientIp = sprintf('127.0.0.%d', random_int(2, 254));
     }
 
     /**
@@ -80,6 +85,14 @@ final class ApiContext implements Context
     public function iSendARequestToAccepting(string $method, string $url, string $accept): void
     {
         $this->sendRequest($method, $url, $accept);
+    }
+
+    /**
+     * @When I send a :method request to :url with headers:
+     */
+    public function iSendARequestToWithHeaders(string $method, string $url, TableNode $table): void
+    {
+        $this->sendRequest($method, $url, 'application/ld+json', $this->tableToHeaders($table));
     }
 
     /**
@@ -248,6 +261,23 @@ final class ApiContext implements Context
     }
 
     /**
+     * @Then the response header :header should equal :value
+     */
+    public function theResponseHeaderShouldEqual(string $header, string $value): void
+    {
+        $actual = $this->client->getResponse()->headers->get($header);
+
+        if ($actual !== $value) {
+            throw new RuntimeException(sprintf(
+                'Expected header "%s" to equal "%s", got "%s"',
+                $header,
+                $value,
+                $actual ?? '',
+            ));
+        }
+    }
+
+    /**
      * @Then the JSON response should be a RFC 7807 problem
      */
     public function theJsonResponseShouldBeRfc7807Problem(): void
@@ -347,20 +377,26 @@ final class ApiContext implements Context
     }
 
     /**
+     * @param array<string, string> $headers
+     *
      * @return array<string, string>
      */
-    private function buildHeaders(string $contentType): array
+    private function buildHeaders(string $contentType, array $headers = []): array
     {
-        return [
+        return $headers + [
             'CONTENT_TYPE' => $contentType,
             'HTTP_ACCEPT' => 'application/ld+json',
+            'REMOTE_ADDR' => $this->scenarioClientIp,
         ];
     }
 
-    private function sendRequest(string $method, string $url, string $accept): void
+    /**
+     * @param array<string, string> $headers
+     */
+    private function sendRequest(string $method, string $url, string $accept, array $headers = []): void
     {
         $url = $this->replaceStoredVariables($url);
-        $headers = $this->buildHeaders('application/json');
+        $headers = $this->buildHeaders('application/json', $headers);
         $headers['HTTP_ACCEPT'] = $accept;
 
         $this->client->request(
@@ -371,5 +407,24 @@ final class ApiContext implements Context
             $headers,
         );
         $this->lastResponseData = null;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function tableToHeaders(TableNode $table): array
+    {
+        $headers = [];
+
+        foreach ($table->getRowsHash() as $name => $value) {
+            if (!is_string($value)) {
+                throw new RuntimeException(sprintf('Header "%s" value must be a string.', $name));
+            }
+
+            $normalized = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+            $headers[$normalized] = $this->replaceStoredVariables($value);
+        }
+
+        return $headers;
     }
 }
