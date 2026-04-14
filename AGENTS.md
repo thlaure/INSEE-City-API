@@ -62,6 +62,17 @@ Always:
 - if API Platform already provides a clean built-in solution, use it instead of adding unnecessary layers
 - prefer fixing PHPStan issues in code, types, or PHPDoc instead of changing `phpstan.neon`
 
+Execution principles:
+
+- think before coding: state material assumptions explicitly, surface meaningful ambiguity instead of choosing silently, and ask when the ambiguity is risky enough to lead to the wrong implementation
+- simplicity first: prefer the minimum implementation that fully satisfies the request; avoid speculative abstractions, configurability, and error handling for scenarios that are not part of the problem
+- surgical changes: touch only what is needed for the request and for verification; do not refactor adjacent code unless correctness or the requested change requires it
+- clean up only your own mess: remove imports, variables, dead code, or formatting issues made obsolete by your change, but do not opportunistically rewrite unrelated areas
+- define success in verifiable terms for non-trivial tasks; prefer checks that prove the requested behavior directly
+- bug fix: reproduce first when practical, then verify the fix
+- behavior change: add or update tests that demonstrate the intended outcome
+- refactor: verify behavior before and after with the relevant test suite
+
 Ask first:
 
 - adding composer packages
@@ -101,6 +112,7 @@ Use the matching workflow when the task fits:
 - verification and checks: `.claude/skills/verify-quality/SKILL.md` or `.claude/commands/symfony/verify-quality.md`
 - commit preparation: `.claude/skills/prepare-commit/SKILL.md` or `.claude/commands/symfony/prepare-commit.md`
 - instruction improvement: `.claude/skills/improve-instructions/SKILL.md` or `.claude/commands/symfony/improve-instructions.md`
+- execution discipline for review, refactor, or ambiguity-heavy tasks: `.claude/skills/karpathy-guidelines/SKILL.md`
 
 Guidance:
 
