@@ -5,7 +5,7 @@ ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/relea
 
 # Install system dependencies and PHP extensions
 # hadolint ignore=DL3018,DL3019
-RUN apk upgrade --no-cache musl \
+RUN apk upgrade --no-cache musl musl-utils \
     && apk add --no-cache \
     git \
     curl \
