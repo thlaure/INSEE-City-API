@@ -1,6 +1,6 @@
 ---
 name: security-review
-description: Use this skill when the user asks for a security review, mentions auth/authz concerns, input validation, secret handling, SSRF, unsafe external calls, or wants a stricter review of a Symfony/API Platform change.
+description: Use this skill when the user asks for a security review, mentions auth/authz concerns, input validation, secret handling, SSRF, unsafe external calls, or wants a stricter review of a Symfony/API Platform change. Also trigger on phrases like "is this secure", "check the security of", "could this be exploited", or "are there vulnerabilities here".
 ---
 
 # Security Review
