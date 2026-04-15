@@ -123,6 +123,16 @@ Guidance:
 - `.claude/settings.json` is the versioned repository-default settings file for both Claude and Codex
 - `.claude/settings.local.json` is only for optional local overrides and must not be treated as the shared team standard
 
+## IP Protection & AI Usage Policy
+
+See `.claude/rules/security.md` rules 10–14 for the full AI data-handling policy.
+
+Summary:
+- MCP servers are blocked project-wide (`allowedMcpServers: []`)
+- `.claudeignore` defines files Claude must never read
+- Do not share proprietary code outside this local Claude Code session
+- Violations should be escalated to the tech lead
+
 ## Instructions Improvement Policy
 
 Instruction files are living documentation and should improve with the project and environment, but only through an explicit proposal-and-confirmation workflow.

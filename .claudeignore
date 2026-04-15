@@ -1,0 +1,18 @@
+# Environment & secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+docker-compose.override.yml
+
+# Build artifacts & generated files
+var/cache/
+var/log/
+vendor/
+
+# IDE & local config
+.idea/
+.vscode/
+*.local.json
