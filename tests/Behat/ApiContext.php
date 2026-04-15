@@ -37,6 +37,7 @@ use function sprintf;
 use function str_contains;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 final class ApiContext implements Context
 {
@@ -51,6 +52,7 @@ final class ApiContext implements Context
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly KernelBrowser $client,
+        private readonly RateLimiterFactoryInterface $apiLimiter,
     ) {
     }
 
@@ -69,6 +71,7 @@ final class ApiContext implements Context
         $this->storedVariables = [];
         $this->lastResponseData = null;
         $this->scenarioClientIp = sprintf('127.0.0.%d', random_int(2, 254));
+        $this->apiLimiter->create($this->scenarioClientIp)->reset();
     }
 
     /**
