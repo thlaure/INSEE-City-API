@@ -1,4 +1,4 @@
-.PHONY: help up down build rebuild clean shell logs lint analyse tests-unit tests-integration tests db-migrate db-reset db-test-create cache-clear composer-install composer-update grumphp security
+.PHONY: help up down build rebuild clean shell logs lint analyse tests-unit tests-integration tests db-migrate db-reset db-test-create cache-clear composer-install composer-update grumphp grumphp-init security ci
 
 # Default target
 .DEFAULT_GOAL := help
@@ -89,6 +89,9 @@ quality: lint analyse rector ## Run all code quality tools (CS Fixer, PHPStan, R
 grumphp: ## Run GrumPHP (all pre-commit checks)
 	docker compose exec app vendor/bin/grumphp run
 
+grumphp-init: ## Install GrumPHP git hooks in this clone
+	vendor/bin/grumphp git:init
+
 ## —— Testing —————————————————————————————————————————————————————————————————
 
 tests-unit: ## Run unit tests
@@ -108,6 +111,17 @@ tests-api: db-test-create ## Run Behat API tests (creates/migrates test DB autom
 
 tests-api-wip: ## Run Behat tests tagged @wip
 	docker compose exec app vendor/bin/behat --colors --tags=@wip
+
+ci: db-test-create ## Run the local equivalent of the CI checks
+	docker compose exec -T app vendor/bin/phpunit
+	docker compose exec -T -e XDEBUG_MODE=coverage app vendor/bin/phpunit --testsuite=Unit --coverage-clover var/coverage/clover.xml --coverage-text
+	docker compose exec -T app vendor/bin/behat --no-interaction --colors
+	docker compose exec -T app composer audit || { code=$$?; [ "$$code" -eq 2 ] || exit "$$code"; }
+	docker compose exec -T app vendor/bin/php-cs-fixer fix --dry-run --diff
+	docker compose exec -T app vendor/bin/phpstan analyse
+	docker compose exec -T app vendor/bin/rector process --dry-run
+	docker compose exec -T app php bin/console lint:yaml config
+	docker compose exec -T app php bin/console -e test doctrine:schema:validate --skip-sync || true
 
 ## —— Database ————————————————————————————————————————————————————————————————
 
@@ -155,7 +169,7 @@ api-docs: ## Open API documentation
 
 ## —— Project Setup ———————————————————————————————————————————————————————————
 
-install: build up composer-install db-migrate ## Full project setup
+install: build up composer-install grumphp-init db-migrate ## Full project setup
 	@echo "$(GREEN)INSEE City API is ready!$(RESET)"
 	@echo "Backend API at: $(CYAN)http://localhost:8001$(RESET)"
 	@echo "API documentation at: $(CYAN)http://localhost:8001/api$(RESET)"
