@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$file = __DIR__ . '/../config/bundles.php';
+$file = __DIR__.'/../config/bundles.php';
 $content = file_get_contents($file);
 
 if (false === $content) {

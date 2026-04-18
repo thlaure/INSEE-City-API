@@ -7,7 +7,6 @@ namespace App\Tests\Integration\Persistence;
 use App\Domain\City\Model\City;
 use App\Infrastructure\Persistence\DoctrineCityRepository;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTimeImmutable;
 
 final class DoctrineCityRepositoryTest extends DatabaseTestCase
 {
@@ -66,8 +65,8 @@ final class DoctrineCityRepositoryTest extends DatabaseTestCase
             departmentCode: $dept,
             regionCode: $region,
             postalCode: $postalCode,
-            createdAt: new DateTimeImmutable(),
-            updatedAt: new DateTimeImmutable(),
+            createdAt: new \DateTimeImmutable(),
+            updatedAt: new \DateTimeImmutable(),
         );
     }
 }

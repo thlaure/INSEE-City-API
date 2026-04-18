@@ -6,9 +6,6 @@ namespace App\UI\Command;
 
 use App\Application\City\Handler\ImportCitiesHandler;
 use App\Domain\City\Exception\CityDataProviderException;
-
-use function sprintf;
-
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,12 +32,12 @@ final class ImportCitiesCommand extends Command
         try {
             $result = ($this->importCitiesHandler)();
         } catch (CityDataProviderException $e) {
-            $io->error('Failed to fetch city data: ' . $e->getMessage());
+            $io->error('Failed to fetch city data: '.$e->getMessage());
 
             return Command::FAILURE;
         }
 
-        $io->success(sprintf(
+        $io->success(\sprintf(
             'Import complete. Created: %d | Updated: %d | Total processed: %d',
             $result->created,
             $result->updated,

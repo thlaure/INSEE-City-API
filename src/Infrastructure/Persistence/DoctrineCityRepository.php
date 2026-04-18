@@ -6,7 +6,6 @@ namespace App\Infrastructure\Persistence;
 
 use App\Domain\City\Model\City as DomainCity;
 use App\Domain\City\Port\CityRepositoryInterface;
-use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -79,7 +78,7 @@ final class DoctrineCityRepository implements CityRepositoryInterface
      */
     private function getKnownInseeCodes(): array
     {
-        if ($this->knownInseeCodes !== null) {
+        if (null !== $this->knownInseeCodes) {
             return $this->knownInseeCodes;
         }
 
@@ -90,7 +89,7 @@ final class DoctrineCityRepository implements CityRepositoryInterface
         return $this->knownInseeCodes;
     }
 
-    private function formatDateTime(DateTimeInterface $dateTime): string
+    private function formatDateTime(\DateTimeInterface $dateTime): string
     {
         return $dateTime->format('Y-m-d H:i:s');
     }

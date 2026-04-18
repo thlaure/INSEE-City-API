@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http\Listener;
 
-use function str_starts_with;
-
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

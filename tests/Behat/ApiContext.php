@@ -4,40 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Behat;
 
-use function array_key_exists;
-
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
-
-use function count;
-
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
-
-use function gettype;
-use function is_array;
-use function is_numeric;
-use function is_scalar;
-use function is_string;
-use function json_decode;
-use function json_encode;
-
-use const JSON_ERROR_NONE;
-
-use function json_last_error;
-use function preg_match;
-use function preg_replace_callback;
-use function random_int;
-
-use RuntimeException;
-
-use function sprintf;
-use function str_contains;
-
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
+
+use function count;
 
 final class ApiContext implements Context
 {
@@ -70,7 +46,7 @@ final class ApiContext implements Context
         $this->entityManager->clear();
         $this->storedVariables = [];
         $this->lastResponseData = null;
-        $this->scenarioClientIp = sprintf('127.0.0.%d', random_int(2, 254));
+        $this->scenarioClientIp = \sprintf('127.0.0.%d', random_int(2, 254));
         $this->apiLimiter->create($this->scenarioClientIp)->reset();
     }
 
@@ -106,7 +82,7 @@ final class ApiContext implements Context
         $url = $this->replaceStoredVariables($url);
         $bodyContent = $this->replaceStoredVariables($body->getRaw());
 
-        $contentType = $method === 'PATCH' ? 'application/merge-patch+json' : 'application/json';
+        $contentType = 'PATCH' === $method ? 'application/merge-patch+json' : 'application/json';
 
         $this->client->request(
             $method,
@@ -127,12 +103,7 @@ final class ApiContext implements Context
         $actual = $this->client->getResponse()->getStatusCode();
 
         if ($actual !== $code) {
-            throw new RuntimeException(sprintf(
-                'Expected status code %d, got %d. Response: %s',
-                $code,
-                $actual,
-                $this->client->getResponse()->getContent(),
-            ));
+            throw new \RuntimeException(\sprintf('Expected status code %d, got %d. Response: %s', $code, $actual, $this->client->getResponse()->getContent()));
         }
     }
 
@@ -145,8 +116,8 @@ final class ApiContext implements Context
         /** @var array<string, mixed>|null $data */
         $data = json_decode((string) $content, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException('Response is not valid JSON: ' . $content);
+        if (\JSON_ERROR_NONE !== json_last_error()) {
+            throw new \RuntimeException('Response is not valid JSON: '.$content);
         }
 
         $this->lastResponseData = $data;
@@ -159,12 +130,8 @@ final class ApiContext implements Context
     {
         $data = $this->getJsonResponse();
 
-        if (!array_key_exists($key, $data)) {
-            throw new RuntimeException(sprintf(
-                'JSON response does not contain key "%s". Keys: %s',
-                $key,
-                implode(', ', array_keys($data)),
-            ));
+        if (!\array_key_exists($key, $data)) {
+            throw new \RuntimeException(\sprintf('JSON response does not contain key "%s". Keys: %s', $key, implode(', ', array_keys($data))));
         }
     }
 
@@ -175,22 +142,17 @@ final class ApiContext implements Context
     {
         $data = $this->getJsonResponse();
 
-        if (!array_key_exists($key, $data)) {
-            throw new RuntimeException(sprintf('Key "%s" not found in response', $key));
+        if (!\array_key_exists($key, $data)) {
+            throw new \RuntimeException(\sprintf('Key "%s" not found in response', $key));
         }
 
         $actual = $data[$key];
-        $expected = is_string($actual) ? $value : $this->castValue($value);
+        $expected = \is_string($actual) ? $value : $this->castValue($value);
 
         if ($actual !== $expected) {
-            $actualString = is_array($actual) ? (string) json_encode($actual) : (is_scalar($actual) ? (string) $actual : '');
+            $actualString = \is_array($actual) ? (string) json_encode($actual) : (\is_scalar($actual) ? (string) $actual : '');
 
-            throw new RuntimeException(sprintf(
-                'Expected "%s" to equal "%s", got "%s"',
-                $key,
-                $value,
-                $actualString,
-            ));
+            throw new \RuntimeException(\sprintf('Expected "%s" to equal "%s", got "%s"', $key, $value, $actualString));
         }
     }
 
@@ -202,15 +164,15 @@ final class ApiContext implements Context
         $data = $this->getJsonResponse();
 
         if (isset($data['member'])) {
-            if ($data['member'] !== []) {
-                throw new RuntimeException('Expected empty collection, got: ' . json_encode($data['member']));
+            if ([] !== $data['member']) {
+                throw new \RuntimeException('Expected empty collection, got: '.json_encode($data['member']));
             }
 
             return;
         }
 
-        if ($data !== []) {
-            throw new RuntimeException('Expected empty array, got: ' . json_encode($data));
+        if ([] !== $data) {
+            throw new \RuntimeException('Expected empty array, got: '.json_encode($data));
         }
     }
 
@@ -221,10 +183,10 @@ final class ApiContext implements Context
     {
         $data = $this->getJsonResponse();
 
-        $actual = isset($data['member']) && is_array($data['member']) ? count($data['member']) : count($data);
+        $actual = isset($data['member']) && \is_array($data['member']) ? \count($data['member']) : \count($data);
 
         if ($actual !== $count) {
-            throw new RuntimeException(sprintf('Expected %d items, got %d', $count, $actual));
+            throw new \RuntimeException(\sprintf('Expected %d items, got %d', $count, $actual));
         }
     }
 
@@ -236,14 +198,14 @@ final class ApiContext implements Context
         $data = $this->getJsonResponse();
 
         if (!isset($data[$field])) {
-            throw new RuntimeException(sprintf('Response does not contain "%s" field', $field));
+            throw new \RuntimeException(\sprintf('Response does not contain "%s" field', $field));
         }
 
         $fieldValue = $data[$field];
         $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
 
-        if (!is_string($fieldValue) || !preg_match($pattern, $fieldValue)) {
-            throw new RuntimeException(sprintf('"%s" is not a valid UUID', is_scalar($fieldValue) ? (string) $fieldValue : gettype($fieldValue)));
+        if (!\is_string($fieldValue) || !preg_match($pattern, $fieldValue)) {
+            throw new \RuntimeException(\sprintf('"%s" is not a valid UUID', \is_scalar($fieldValue) ? (string) $fieldValue : \gettype($fieldValue)));
         }
     }
 
@@ -255,11 +217,7 @@ final class ApiContext implements Context
         $actual = $this->client->getResponse()->headers->get('Content-Type');
 
         if (!str_contains($actual ?? '', $contentType)) {
-            throw new RuntimeException(sprintf(
-                'Expected content type to contain "%s", got "%s"',
-                $contentType,
-                $actual ?? '',
-            ));
+            throw new \RuntimeException(\sprintf('Expected content type to contain "%s", got "%s"', $contentType, $actual ?? ''));
         }
     }
 
@@ -271,12 +229,7 @@ final class ApiContext implements Context
         $actual = $this->client->getResponse()->headers->get($header);
 
         if ($actual !== $value) {
-            throw new RuntimeException(sprintf(
-                'Expected header "%s" to equal "%s", got "%s"',
-                $header,
-                $value,
-                $actual ?? '',
-            ));
+            throw new \RuntimeException(\sprintf('Expected header "%s" to equal "%s", got "%s"', $header, $value, $actual ?? ''));
         }
     }
 
@@ -288,10 +241,7 @@ final class ApiContext implements Context
         $contentType = $this->client->getResponse()->headers->get('Content-Type') ?? '';
 
         if (!str_contains($contentType, 'application/problem+json') && !str_contains($contentType, 'application/ld+json')) {
-            throw new RuntimeException(sprintf(
-                'Expected problem response content type, got "%s"',
-                $contentType,
-            ));
+            throw new \RuntimeException(\sprintf('Expected problem response content type, got "%s"', $contentType));
         }
 
         $this->theJsonResponseShouldContain('type');
@@ -308,13 +258,13 @@ final class ApiContext implements Context
         $data = $this->getJsonResponse();
 
         if (!isset($data[$field])) {
-            throw new RuntimeException(sprintf('Field "%s" not found in response. Available: %s', $field, implode(', ', array_keys($data))));
+            throw new \RuntimeException(\sprintf('Field "%s" not found in response. Available: %s', $field, implode(', ', array_keys($data))));
         }
 
         $fieldValue = $data[$field];
 
-        if (!is_string($fieldValue)) {
-            throw new RuntimeException(sprintf('Field "%s" is not a string', $field));
+        if (!\is_string($fieldValue)) {
+            throw new \RuntimeException(\sprintf('Field "%s" is not a string', $field));
         }
 
         $this->storedVariables[$variable] = $fieldValue;
@@ -325,7 +275,7 @@ final class ApiContext implements Context
      */
     private function getJsonResponse(): array
     {
-        if ($this->lastResponseData !== null) {
+        if (null !== $this->lastResponseData) {
             return $this->lastResponseData;
         }
 
@@ -333,8 +283,8 @@ final class ApiContext implements Context
         /** @var array<string, mixed>|null $data */
         $data = json_decode((string) $content, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE || $data === null) {
-            throw new RuntimeException('Response is not valid JSON: ' . $content);
+        if (\JSON_ERROR_NONE !== json_last_error() || null === $data) {
+            throw new \RuntimeException('Response is not valid JSON: '.$content);
         }
 
         $this->lastResponseData = $data;
@@ -349,7 +299,7 @@ final class ApiContext implements Context
             $variable = $matches[1];
 
             if (!isset($storedVars[$variable])) {
-                throw new RuntimeException(sprintf('Variable "%s" not stored', $variable));
+                throw new \RuntimeException(\sprintf('Variable "%s" not stored', $variable));
             }
 
             return $storedVars[$variable];
@@ -360,15 +310,15 @@ final class ApiContext implements Context
 
     private function castValue(string $value): mixed
     {
-        if ($value === 'true') {
+        if ('true' === $value) {
             return true;
         }
 
-        if ($value === 'false') {
+        if ('false' === $value) {
             return false;
         }
 
-        if ($value === 'null') {
+        if ('null' === $value) {
             return null;
         }
 
@@ -420,11 +370,11 @@ final class ApiContext implements Context
         $headers = [];
 
         foreach ($table->getRowsHash() as $name => $value) {
-            if (!is_string($value)) {
-                throw new RuntimeException(sprintf('Header "%s" value must be a string.', $name));
+            if (!\is_string($value)) {
+                throw new \RuntimeException(\sprintf('Header "%s" value must be a string.', $name));
             }
 
-            $normalized = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+            $normalized = 'HTTP_'.strtoupper(str_replace('-', '_', $name));
             $headers[$normalized] = $this->replaceStoredVariables($value);
         }
 

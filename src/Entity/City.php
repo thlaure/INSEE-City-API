@@ -11,10 +11,12 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
-use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\UuidV7;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ApiResource(shortName: 'City', operations: [
     new Get(
@@ -34,8 +36,8 @@ use Symfony\Component\Uid\UuidV7;
                 property: 'name',
                 description: 'Partial match on the city name.',
                 constraints: [
-                    new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "name" filter must not be blank. Omit the parameter to return all cities.', allowNull: true),
-                    new \Symfony\Component\Validator\Constraints\Length(max: 255),
+                    new NotBlank(message: 'The "name" filter must not be blank. Omit the parameter to return all cities.', allowNull: true),
+                    new Length(max: 255),
                 ],
                 castToArray: false,
             ),
@@ -46,8 +48,8 @@ use Symfony\Component\Uid\UuidV7;
                 property: 'name',
                 description: 'Exact match on the city name.',
                 constraints: [
-                    new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "exactName" filter must not be blank. Omit the parameter to disable exact-name search.', allowNull: true),
-                    new \Symfony\Component\Validator\Constraints\Length(max: 255),
+                    new NotBlank(message: 'The "exactName" filter must not be blank. Omit the parameter to disable exact-name search.', allowNull: true),
+                    new Length(max: 255),
                 ],
                 castToArray: false,
             ),
@@ -57,8 +59,8 @@ use Symfony\Component\Uid\UuidV7;
                 property: 'departmentCode',
                 description: 'Exact match on the department code.',
                 constraints: [
-                    new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "departmentCode" filter must not be blank. Omit the parameter to disable this filter.', allowNull: true),
-                    new \Symfony\Component\Validator\Constraints\Length(max: 10),
+                    new NotBlank(message: 'The "departmentCode" filter must not be blank. Omit the parameter to disable this filter.', allowNull: true),
+                    new Length(max: 10),
                 ],
                 castToArray: false,
             ),
@@ -68,8 +70,8 @@ use Symfony\Component\Uid\UuidV7;
                 property: 'regionCode',
                 description: 'Exact match on the region code.',
                 constraints: [
-                    new \Symfony\Component\Validator\Constraints\NotBlank(message: 'The "regionCode" filter must not be blank. Omit the parameter to disable this filter.', allowNull: true),
-                    new \Symfony\Component\Validator\Constraints\Length(max: 10),
+                    new NotBlank(message: 'The "regionCode" filter must not be blank. Omit the parameter to disable this filter.', allowNull: true),
+                    new Length(max: 10),
                 ],
                 castToArray: false,
             ),
@@ -88,31 +90,31 @@ class City
     #[ORM\Column(type: 'uuid', unique: true)]
     private UuidV7 $id;
 
-    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $updatedAt;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private \DateTimeImmutable $updatedAt;
 
     public function __construct(
         #[ApiProperty(identifier: true)]
         #[Groups(['city:read'])]
-        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10, unique: true)]
+        #[ORM\Column(type: Types::STRING, length: 10, unique: true)]
         private string $inseeCode,
         #[Groups(['city:read'])]
-        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+        #[ORM\Column(type: Types::STRING, length: 255)]
         private string $name,
         #[Groups(['city:read'])]
-        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10)]
+        #[ORM\Column(type: Types::STRING, length: 10)]
         private string $departmentCode,
         #[Groups(['city:read'])]
-        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10)]
+        #[ORM\Column(type: Types::STRING, length: 10)]
         private string $regionCode,
         #[Groups(['city:read'])]
-        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 10, nullable: true)]
+        #[ORM\Column(type: Types::STRING, length: 10, nullable: true)]
         private ?string $postalCode = null,
-        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)]
-        private DateTimeImmutable $createdAt = new DateTimeImmutable(),
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+        private \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
     ) {
         $this->id = new UuidV7();
-        $this->updatedAt = new DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): UuidV7
@@ -145,12 +147,12 @@ class City
         return $this->postalCode;
     }
 
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -165,6 +167,6 @@ class City
         $this->departmentCode = $departmentCode;
         $this->regionCode = $regionCode;
         $this->postalCode = $postalCode;
-        $this->updatedAt = new DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }

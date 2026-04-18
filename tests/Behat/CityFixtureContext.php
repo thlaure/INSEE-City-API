@@ -6,7 +6,7 @@ namespace App\Tests\Behat;
 
 use App\Entity\City;
 use Behat\Behat\Context\Context;
-use DateTimeImmutable;
+use Behat\Gherkin\Node\TableNode;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class CityFixtureContext implements Context
@@ -27,7 +27,7 @@ final readonly class CityFixtureContext implements Context
     /**
      * @Given the following cities exist:
      */
-    public function theFollowingCitiesExist(\Behat\Gherkin\Node\TableNode $table): void
+    public function theFollowingCitiesExist(TableNode $table): void
     {
         foreach ($table->getHash() as $row) {
             $city = new City(
@@ -35,8 +35,8 @@ final readonly class CityFixtureContext implements Context
                 name: $row['name'],
                 departmentCode: $row['departmentCode'],
                 regionCode: $row['regionCode'],
-                postalCode: $row['postalCode'] !== '' ? ($row['postalCode'] ?? null) : null,
-                createdAt: new DateTimeImmutable(),
+                postalCode: '' !== $row['postalCode'] ? ($row['postalCode'] ?? null) : null,
+                createdAt: new \DateTimeImmutable(),
             );
 
             $this->entityManager->persist($city);

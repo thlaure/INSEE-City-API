@@ -9,12 +9,8 @@ use App\Domain\City\Exception\CityDataProviderException;
 use App\Domain\City\Model\City;
 use App\Domain\City\Port\CityDataProviderInterface;
 use App\Domain\City\Port\CityRepositoryInterface;
-use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
-
-use function sprintf;
 
 final class ImportCitiesHandlerTest extends TestCase
 {
@@ -95,7 +91,7 @@ final class ImportCitiesHandlerTest extends TestCase
         $cities = [];
 
         for ($i = 0; $i < 100; ++$i) {
-            $cities[] = $this->makeCity(sprintf('75%03d', $i), sprintf('Paris %d', $i), '75', '11', '');
+            $cities[] = $this->makeCity(\sprintf('75%03d', $i), \sprintf('Paris %d', $i), '75', '11', '');
         }
 
         $this->dataProvider->expects($this->once())
@@ -117,7 +113,7 @@ final class ImportCitiesHandlerTest extends TestCase
     {
         $this->dataProvider->expects($this->once())
             ->method('fetchAllCities')
-            ->willThrowException(CityDataProviderException::fromPrevious(new RuntimeException('timeout')));
+            ->willThrowException(CityDataProviderException::fromPrevious(new \RuntimeException('timeout')));
 
         $this->expectException(CityDataProviderException::class);
 
@@ -137,8 +133,8 @@ final class ImportCitiesHandlerTest extends TestCase
             departmentCode: $departmentCode,
             regionCode: $regionCode,
             postalCode: $postalCode,
-            createdAt: new DateTimeImmutable(),
-            updatedAt: new DateTimeImmutable(),
+            createdAt: new \DateTimeImmutable(),
+            updatedAt: new \DateTimeImmutable(),
         );
     }
 }
