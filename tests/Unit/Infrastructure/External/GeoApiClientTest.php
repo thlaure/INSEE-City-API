@@ -6,9 +6,6 @@ namespace App\Tests\Unit\Infrastructure\External;
 
 use App\Domain\City\Exception\CityDataProviderException;
 use App\Infrastructure\External\GeoApiClient;
-
-use const JSON_THROW_ON_ERROR;
-
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -22,7 +19,7 @@ final class GeoApiClientTest extends TestCase
                 new MockResponse(json_encode([
                     ['code' => '75'],
                     ['code' => '69'],
-                ], JSON_THROW_ON_ERROR)),
+                ], \JSON_THROW_ON_ERROR)),
                 new MockResponse(json_encode([
                     [
                         'code' => '75056',
@@ -31,7 +28,7 @@ final class GeoApiClientTest extends TestCase
                         'codeRegion' => '11',
                         'codesPostaux' => ['75001'],
                     ],
-                ], JSON_THROW_ON_ERROR)),
+                ], \JSON_THROW_ON_ERROR)),
                 new MockResponse(json_encode([
                     [
                         'code' => '69123',
@@ -40,7 +37,7 @@ final class GeoApiClientTest extends TestCase
                         'codeRegion' => '84',
                         'codesPostaux' => ['69001'],
                     ],
-                ], JSON_THROW_ON_ERROR)),
+                ], \JSON_THROW_ON_ERROR)),
             ]),
             'https://geo.api.gouv.fr',
         );
@@ -62,7 +59,7 @@ final class GeoApiClientTest extends TestCase
             new MockHttpClient([
                 new MockResponse(json_encode([
                     ['code' => '75'],
-                ], JSON_THROW_ON_ERROR)),
+                ], \JSON_THROW_ON_ERROR)),
                 new MockResponse(json_encode([
                     [
                         'nom' => 'Paris',
@@ -70,7 +67,7 @@ final class GeoApiClientTest extends TestCase
                         'codeRegion' => '11',
                         'codesPostaux' => ['75001'],
                     ],
-                ], JSON_THROW_ON_ERROR)),
+                ], \JSON_THROW_ON_ERROR)),
             ]),
             'https://geo.api.gouv.fr',
         );
@@ -87,7 +84,7 @@ final class GeoApiClientTest extends TestCase
             new MockHttpClient([
                 new MockResponse(json_encode([
                     ['name' => 'Paris'],
-                ], JSON_THROW_ON_ERROR)),
+                ], \JSON_THROW_ON_ERROR)),
             ]),
             'https://geo.api.gouv.fr',
         );

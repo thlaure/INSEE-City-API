@@ -6,8 +6,8 @@ namespace App\UI\Controller;
 
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
-use Throwable;
 
 #[AsController]
 final readonly class HealthController
@@ -20,8 +20,8 @@ final readonly class HealthController
     {
         try {
             $this->connection->executeQuery('SELECT 1');
-        } catch (Throwable) {
-            return new JsonResponse(['status' => 'error', 'detail' => 'Database unavailable'], \Symfony\Component\HttpFoundation\Response::HTTP_SERVICE_UNAVAILABLE);
+        } catch (\Throwable) {
+            return new JsonResponse(['status' => 'error', 'detail' => 'Database unavailable'], Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         return new JsonResponse(['status' => 'ok']);

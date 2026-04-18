@@ -7,24 +7,8 @@ namespace App\Infrastructure\External;
 use App\Domain\City\Exception\CityDataProviderException;
 use App\Domain\City\Model\City;
 use App\Domain\City\Port\CityDataProviderInterface;
-
-use function array_key_exists;
-use function array_keys;
-use function array_map;
-
-use DateTimeImmutable;
-
-use function is_array;
-use function is_string;
-use function sprintf;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Throwable;
-
-use function trim;
-
-use UnexpectedValueException;
 
 final readonly class GeoApiClient implements CityDataProviderInterface
 {
@@ -51,7 +35,7 @@ final readonly class GeoApiClient implements CityDataProviderInterface
                     yield $this->mapCity($rawCity, $index);
                 }
             }
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw CityDataProviderException::fromPrevious($e);
         }
     }
@@ -61,7 +45,7 @@ final readonly class GeoApiClient implements CityDataProviderInterface
      */
     private function fetchDepartmentCodes(): array
     {
-        $response = $this->httpClient->request(Request::METHOD_GET, $this->baseUrl . self::DEPARTMENTS_PATH, [
+        $response = $this->httpClient->request(Request::METHOD_GET, $this->baseUrl.self::DEPARTMENTS_PATH, [
             'query' => [
                 'fields' => 'code',
                 'format' => 'json',
@@ -80,7 +64,7 @@ final readonly class GeoApiClient implements CityDataProviderInterface
      */
     private function fetchCitiesByDepartment(string $departmentCode): array
     {
-        $response = $this->httpClient->request(Request::METHOD_GET, sprintf('%s%s/%s%s', $this->baseUrl, self::DEPARTMENTS_PATH, $departmentCode, self::COMMUNES_PATH), [
+        $response = $this->httpClient->request(Request::METHOD_GET, \sprintf('%s%s/%s%s', $this->baseUrl, self::DEPARTMENTS_PATH, $departmentCode, self::COMMUNES_PATH), [
             'query' => [
                 'fields' => self::FIELDS,
                 'format' => 'json',
@@ -104,7 +88,7 @@ final readonly class GeoApiClient implements CityDataProviderInterface
         $departmentCode = $this->requireStringField($rawCity, 'codeDepartement', $index);
         $regionCode = $this->requireStringField($rawCity, 'codeRegion', $index);
         $postalCode = $this->extractPostalCode($rawCity['codesPostaux'] ?? null, $index);
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
 
         return new City(
             inseeCode: $inseeCode,
@@ -122,8 +106,8 @@ final readonly class GeoApiClient implements CityDataProviderInterface
      */
     private function requireStringField(array $rawCity, string $field, int $index): string
     {
-        if (!array_key_exists($field, $rawCity) || !is_string($rawCity[$field]) || '' === trim($rawCity[$field])) {
-            throw new UnexpectedValueException(sprintf('Invalid "%s" field for city payload at index %d.', $field, $index));
+        if (!\array_key_exists($field, $rawCity) || !\is_string($rawCity[$field]) || '' === trim($rawCity[$field])) {
+            throw new \UnexpectedValueException(\sprintf('Invalid "%s" field for city payload at index %d.', $field, $index));
         }
 
         return $rawCity[$field];
@@ -135,8 +119,8 @@ final readonly class GeoApiClient implements CityDataProviderInterface
             return null;
         }
 
-        if (!is_array($postalCodes)) {
-            throw new UnexpectedValueException(sprintf('Invalid "codesPostaux" field for city payload at index %d.', $index));
+        if (!\is_array($postalCodes)) {
+            throw new \UnexpectedValueException(\sprintf('Invalid "codesPostaux" field for city payload at index %d.', $index));
         }
 
         if ([] === $postalCodes) {
@@ -145,8 +129,8 @@ final readonly class GeoApiClient implements CityDataProviderInterface
 
         $firstPostalCode = $postalCodes[0] ?? null;
 
-        if (!is_string($firstPostalCode)) {
-            throw new UnexpectedValueException(sprintf('Invalid first postal code for city payload at index %d.', $index));
+        if (!\is_string($firstPostalCode)) {
+            throw new \UnexpectedValueException(\sprintf('Invalid first postal code for city payload at index %d.', $index));
         }
 
         return $firstPostalCode;

@@ -7,7 +7,6 @@ namespace App\Tests\Unit\UI\Controller;
 use App\UI\Controller\HealthController;
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
 final class HealthControllerTest extends TestCase
@@ -35,7 +34,7 @@ final class HealthControllerTest extends TestCase
             ->expects($this->once())
             ->method('executeQuery')
             ->with('SELECT 1')
-            ->willThrowException(new RuntimeException('db down'));
+            ->willThrowException(new \RuntimeException('db down'));
 
         $controller = new HealthController($connection);
 

@@ -4,19 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http\Listener;
 
-use function bin2hex;
-use function hrtime;
-use function is_int;
-use function is_string;
-use function preg_replace;
-
 use Psr\Log\LoggerInterface;
-
-use function random_bytes;
-use function round;
-use function str_starts_with;
-use function substr;
-
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -60,11 +48,11 @@ final readonly class ApiRequestLogListener
 
         $response = $event->getResponse();
         $raw = $request->attributes->get('_request_id');
-        $requestId = is_string($raw) ? $raw : '';
+        $requestId = \is_string($raw) ? $raw : '';
         $response->headers->set('X-Request-Id', $requestId);
 
         $startTime = $request->attributes->get('_api_log_start');
-        $durationMs = is_int($startTime)
+        $durationMs = \is_int($startTime)
             ? (int) round((hrtime(true) - $startTime) / 1_000_000)
             : null;
 
