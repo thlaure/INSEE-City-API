@@ -1,10 +1,7 @@
----
-title: "Programmation agentique : retour d'expérience sur mes side projects"
-subtitle: "Ce que j'ai appris, ce qui marche, ce qui casse"
-author: "Thomas Laure"
-date: "Vendredi 24 avril 2026"
-lang: fr
----
+# Programmation agentique : retour d'expérience sur mes side projects
+
+## Ce que j'ai appris, ce qui marche, ce qui casse
+
 
 # Avant-propos
 
