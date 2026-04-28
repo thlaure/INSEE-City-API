@@ -2,7 +2,12 @@ Perform a structured code review for a Symfony/API Platform change.
 
 Review scope: `$ARGUMENTS`
 
-If the scope is omitted, inspect the current git diff.
+Current diff:
+```
+!`git diff`
+```
+
+If the scope is omitted or overrides the diff above, use the scope from `$ARGUMENTS`.
 
 Review checklist:
 1. Confirm the change respects the repository architecture and `AGENTS.md`.

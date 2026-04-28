@@ -2,7 +2,12 @@ Perform a focused security review for a Symfony/API Platform change.
 
 Review scope: `$ARGUMENTS`
 
-If the scope is omitted, inspect the current git diff.
+Current diff:
+```
+!`git diff`
+```
+
+If the scope is omitted or overrides the diff above, use the scope from `$ARGUMENTS`.
 
 Security checklist:
 1. Authentication:

@@ -1,3 +1,8 @@
+---
+paths:
+  - "src/**"
+  - "config/**"
+---
 # Architecture Rules
 
 - Read `AGENTS.md` first. It is the canonical source of repository-specific rules.
