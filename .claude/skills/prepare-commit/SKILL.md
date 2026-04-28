@@ -20,19 +20,17 @@ Workflow:
 1. Inspect the current branch and working tree.
 2. Stage the intended files with `git add`.
 3. Run the repository quality checks relevant to the current change.
-4. Review the change for correctness, architecture, validation, regressions, and test coverage.
-5. Review the change with a security lens.
-6. If the current branch is `main`, `master`, `develop`, or another protected/shared branch, create a dedicated working branch first.
-7. Build a Conventional Commit title and optional body from the actual change.
-8. Prepare PR-ready notes:
+4. If the current branch is `main`, `master`, `develop`, or another protected/shared branch, create a dedicated working branch first.
+5. Build a Conventional Commit title and optional body from the actual change.
+6. Prepare PR-ready notes:
    - what
    - why
    - how
    - tests or verification
    - risks or follow-up
-9. Prepare a checkbox-style verification list using the repo's actual quality gates.
-10. If the user explicitly asks to commit, ask for confirmation before running `git commit`.
-11. If the user explicitly asks to push, ask for confirmation before running `git push`.
+7. Prepare a checkbox-style verification list using the repo's actual quality gates.
+8. If the user explicitly asks to commit, ask for confirmation before running `git commit`.
+9. If the user explicitly asks to push, ask for confirmation before running `git push`.
 
 Rules:
 - Never commit or push without explicit confirmation in the current conversation.
