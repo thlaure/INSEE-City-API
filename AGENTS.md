@@ -90,6 +90,19 @@ Never:
 - create duplicated agent instructions across `AGENTS.md` and `CLAUDE.md`
 - run `git commit` or `git push` silently; always ask for confirmation in the current conversation first
 
+## Pull Request Process
+
+When asked to create a PR:
+
+- Do **not** push — assume the branch is already pushed by the user
+- Use `gh pr create` with the current branch against `main`
+- Block and surface an error if:
+  - the current branch is `main`, `master`, or `develop` (protected branch — no PR from there)
+  - the branch has no commits ahead of the base branch
+  - the branch does not exist on the remote
+- Build the PR title from the Conventional Commit on the branch
+- Include in the body: what changed, why, how it was implemented, what was verified, remaining risks
+
 ## Shared `.claude` Assets
 
 Claude and Codex must both use the repo-local `.claude/` folder as shared operational guidance.
