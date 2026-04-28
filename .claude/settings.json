@@ -30,6 +30,7 @@
       "Bash(composer require:*)",
       "Bash(composer remove:*)",
       "Bash(composer update:*)",
+      "Bash(rm:*)",
       "Bash(rm -rf:*)",
       "Bash(rm -r:*)",
       "Bash(rm -f:*)",

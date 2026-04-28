@@ -1,13 +1,17 @@
-Implement a new Symfony/API Platform feature by mirroring the local repository patterns.
+Implement a new Symfony/API Platform feature by mirroring the local repository patterns, using a TDD approach.
 
 User request: `$ARGUMENTS`
 
 Execution order:
-1. Run the equivalent of `/symfony:scan-project` if context is incomplete.
+1. If acceptance criteria were not provided, ask for them before doing anything else. Do not proceed until the user supplies them.
+2. Run the equivalent of `/symfony:scan-project` if context is incomplete.
 2. Find one nearby example in the same area and mirror its structure.
-3. Implement the smallest coherent slice that satisfies the request.
-4. Write tests in the same session.
-5. Run the repository quality gates before reporting completion.
+3. **TDD phase — write tests first, implement second:**
+   a. Write the Behat scenario(s) covering the expected API behavior. Stop and present them. Wait for explicit approval before continuing.
+   b. Write unit test function signatures (method names, arrange/act/assert structure, no body yet). Stop and present them. Wait for explicit approval before continuing.
+   c. Fill in the unit test bodies. Stop and present them. Wait for explicit approval before continuing.
+   d. Only after all tests are approved: implement the feature code to make the tests pass.
+4. Run the repository quality gates before reporting completion.
 
 Default expectations unless the repo clearly differs:
 - Follow SOLID principles.

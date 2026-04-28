@@ -1,3 +1,9 @@
+---
+paths:
+  - "src/**"
+  - "config/**"
+  - ".env*"
+---
 # Security Rules
 
 - Never hardcode secrets, tokens, or credentials.

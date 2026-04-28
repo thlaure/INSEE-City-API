@@ -1,6 +1,7 @@
 ---
 name: review-change
 description: Use this skill when the user asks for a code review, a correctness pass, a check before PR, or asks whether a Symfony/API Platform change follows project conventions. Trigger on "review this", "check my changes", or "is this implementation correct?".
+allowed-tools: Read, Grep, Glob
 ---
 
 # Review Change

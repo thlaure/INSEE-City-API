@@ -1,3 +1,9 @@
+---
+paths:
+  - "tests/**"
+  - "features/**"
+  - "src/**"
+---
 # Testing Rules
 
 - Tests are part of delivery, not follow-up work.
