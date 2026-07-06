@@ -26,10 +26,7 @@
       "Edit"
     ],
     "deny": [
-      "Bash(git push:*)",
-      "Bash(composer require:*)",
       "Bash(composer remove:*)",
-      "Bash(composer update:*)",
       "Bash(rm -rf:*)",
       "Bash(rm -r:*)",
       "Bash(rm -f:*)",
