@@ -240,6 +240,4 @@ make routes        # list Symfony routes
 
 ## Agent Docs
 
-Project-specific agent instructions live in [AGENTS.md](AGENTS.md).
-
-`CLAUDE.md` is intentionally only a pointer to `AGENTS.md` so Codex and Claude share one canonical instruction file.
+Project-specific agent instructions live in [CLAUDE.md](CLAUDE.md).

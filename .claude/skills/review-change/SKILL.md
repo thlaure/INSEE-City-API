@@ -9,7 +9,6 @@ allowed-tools: Read, Grep, Glob
 Use this skill to review a change for correctness, architecture, and test completeness.
 
 Read first:
-- `AGENTS.md`
 - `.claude/rules/architecture.md`
 - `.claude/rules/testing.md`
 - `.claude/rules/security.md`

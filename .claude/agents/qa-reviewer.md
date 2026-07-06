@@ -14,7 +14,7 @@ Read and apply these files at the start of every review:
 
 - `.claude/rules/architecture.md` — layering, SOLID, entrypoint boundaries, API Platform usage
 - `.claude/rules/testing.md` — test scope, regression coverage, naming, happy/failure path requirements
-- `AGENTS.md` — canonical project rules, quality gates, and structure
+- `CLAUDE.md` — canonical project rules, quality gates, and structure
 
 ## Project Context
 

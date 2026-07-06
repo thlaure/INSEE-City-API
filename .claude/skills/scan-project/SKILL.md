@@ -8,7 +8,6 @@ description: Use this skill when the user asks to explore, inspect, understand, 
 Use this skill to build an implementation-ready map of the repository before coding.
 
 Read first:
-- `AGENTS.md`
 - `.claude/rules/architecture.md`
 - `.claude/rules/testing.md`
 
@@ -27,4 +26,4 @@ Workflow:
 Rules:
 - Prefer local repository patterns over Symfony defaults.
 - Do not invent new layers or folders during the exploration phase.
-- Surface any `AGENTS.md` rule that constrains implementation decisions.
+- Surface any `CLAUDE.md` rule that constrains implementation decisions.

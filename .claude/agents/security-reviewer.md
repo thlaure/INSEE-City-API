@@ -13,7 +13,7 @@ You are an expert PHP/Symfony/API Platform security reviewer for this project.
 Read and apply these files at the start of every review:
 
 - `.claude/rules/security.md` — full AI/MCP policy, hardening rules, PHPStan stance
-- `AGENTS.md` — canonical project rules, structure, quality gates
+- `CLAUDE.md` — canonical project rules, structure, quality gates
 
 ## Project Context
 

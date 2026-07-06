@@ -8,7 +8,6 @@ description: Use this skill when the user reports broken behavior, errors, regre
 Use this skill for a small, repeatable regression-first bug-fix workflow.
 
 Read first:
-- `AGENTS.md`
 - `.claude/rules/architecture.md`
 - `.claude/rules/testing.md`
 - `.claude/rules/security.md`

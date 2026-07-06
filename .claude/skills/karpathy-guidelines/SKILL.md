@@ -8,7 +8,7 @@ license: MIT
 
 Use this skill when the task risks overcomplication, silent assumptions, or broad changes that are not tightly tied to the request.
 
-This skill reinforces the repository rules in `AGENTS.md`; it does not replace them.
+This skill reinforces the repository rules in `CLAUDE.md`; it does not replace them.
 
 ## Apply This Skill When
 

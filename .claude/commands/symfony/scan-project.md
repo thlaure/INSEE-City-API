@@ -3,7 +3,7 @@ Review this Symfony/API Platform repository and produce an implementation-ready 
 User request: `$ARGUMENTS`
 
 Workflow:
-1. Read `AGENTS.md`, `CLAUDE.md`, `README.md`, `composer.json`, and `Makefile`.
+1. Read `README.md`, `composer.json`, and `Makefile`.
 2. Inspect the project layout before proposing any change:
    - `src/`
    - `config/`
@@ -29,4 +29,4 @@ Output format:
 Rules:
 - Prefer local project patterns over Symfony defaults.
 - Do not invent new folders or layers when the repo already has a clear shape.
-- Surface any policy in `AGENTS.md` that requires explicit confirmation before changes.
+- Surface any policy in `CLAUDE.md` that requires explicit confirmation before changes.

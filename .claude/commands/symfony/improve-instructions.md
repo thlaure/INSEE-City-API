@@ -3,7 +3,6 @@ Review the repository guidance and propose improvements to instruction files wit
 Scope or context: `$ARGUMENTS`
 
 Target files:
-- `AGENTS.md`
 - `CLAUDE.md`
 - `.claude/rules/*.md`
 - `.claude/patterns.md`
@@ -29,8 +28,7 @@ Workflow:
 
 Rules:
 - Never edit instruction files silently.
-- `AGENTS.md` remains the canonical source of repository-specific rules.
-- `CLAUDE.md` must stay a thin pointer.
+- `CLAUDE.md` remains the canonical source of repository-specific rules.
 - Update `.claude` files only when the improvement is reusable and not just project noise.
 - If commands and skills overlap, keep them aligned with the same underlying rules and patterns.
 

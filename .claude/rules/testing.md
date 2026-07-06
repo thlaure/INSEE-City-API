@@ -16,3 +16,10 @@ paths:
 - Keep test naming consistent with the repository convention.
 - Run the narrowest relevant tests first, then the broader repository checks.
 - If a behavior changes and no test is added or updated, explain why explicitly.
+
+## Paths and naming
+
+- Unit tests: `tests/Unit`
+- Integration tests: `tests/Integration`
+- API tests: `features/api` (Behat)
+- PHPUnit method names must stay camelCase

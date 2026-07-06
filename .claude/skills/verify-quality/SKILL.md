@@ -8,7 +8,6 @@ description: Use this skill when the user asks to run checks, validate a change,
 Use this skill to run the repository's real quality gates in a predictable order.
 
 Read first:
-- `AGENTS.md`
 - `.claude/rules/testing.md`
 
 Read as needed:
