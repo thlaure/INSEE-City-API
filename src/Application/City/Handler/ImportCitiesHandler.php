@@ -10,6 +10,8 @@ use App\Domain\City\Port\CityRepositoryInterface;
 
 final readonly class ImportCitiesHandler
 {
+    private const int FLUSH_BATCH_SIZE = 50;
+
     public function __construct(
         private CityDataProviderInterface $dataProvider,
         private CityRepositoryInterface $cityRepository,
@@ -27,7 +29,7 @@ final readonly class ImportCitiesHandler
             $isNew = $this->cityRepository->save($city);
             $isNew ? ++$created : ++$updated;
 
-            if (0 === ++$batchCount % 50) {
+            if (0 === ++$batchCount % self::FLUSH_BATCH_SIZE) {
                 $this->cityRepository->flush();
             }
         }
