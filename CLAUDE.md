@@ -1,9 +1,80 @@
 # Claude Guide
 
-Source of truth: see `AGENTS.md`.
+Canonical agent instructions. Always-loaded core only — detailed, path-scoped
+rules live in `.claude/rules/*` and load automatically when you edit matching
+files. Don't restate rule-file content here.
 
-Claude-specific policy for this repository:
+## Project
 
-- follow `AGENTS.md`
-- do not duplicate project instructions here
-- if instructions change, update `AGENTS.md` and keep this file as a pointer
+- Symfony/API Platform API for French city data. PHP 8.5, Symfony 7.4, API Platform 4.x, PostgreSQL, FrankenPHP.
+- Primary workflows: import commune data (write) and expose read-only city search/lookup (read).
+- Preserve API version prefix `/api/v1`.
+
+## Architecture
+
+- `Application`: use-case orchestration. `Domain`: business models, domain exceptions, ports. `Infrastructure`: Doctrine/API clients/runtime adapters. `UI`: entrypoints (console commands, controllers).
+- Write flow stays layered and explicit: `UI Command → Application Handler → Domain Model → Domain Port → Infrastructure Adapter`.
+- Read flow is API Platform native: `API Platform → Provider → Doctrine ORM → App\Entity\City`. Read resources live in `src/UI/ApiResource/`, decoupled from the Doctrine entity; providers under `src/Infrastructure/Http/Provider/` map entities to resources. Prefer this Provider pattern over a custom controller for new read-only endpoints backed by Doctrine.
+- If API Platform already supports the required behavior cleanly, prefer the built-in feature over adding a custom layer.
+
+## Always
+
+- `declare(strict_types=1);` in every file
+- Tests for behavior changes, in the same session — see `.claude/rules/testing.md`
+- Run verification after changes
+- Fix PHPStan in code/types/PHPDoc, not by loosening `phpstan.neon`
+- Prefer readability and reviewability over premature optimization; surgical changes over opportunistic refactors
+
+## Ask first (no harness guard — you are the only gate)
+
+- adding composer packages
+- changing the PostgreSQL schema
+- changing the external city data source strategy
+- changing `phpstan.neon`
+- `git commit` / `git push` — confirm in the current conversation first
+
+## Never
+
+- put business logic in controllers or framework entrypoints
+- commit directly to `main`, `master`, or `develop`
+
+> Composer installs, commits to protected branches, secret/`.env` writes, and
+> out-of-project writes are blocked by `.claude/settings.json` + hooks — not repeated here.
+
+## Detail (open on demand)
+
+- `.claude/rules/architecture.md` — layering, SOLID, entrypoint boundaries
+- `.claude/rules/testing.md` — test scope, naming, paths, coverage expectations
+- `.claude/rules/security.md` — secrets, AI/MCP policy, static-analysis stance
+- `.claude/patterns.md`
+
+## Workflows (skills)
+
+scan-project · new-feature · bug-fix · review-change · security-review ·
+verify-quality · prepare-commit · improve-instructions · karpathy-guidelines.
+Same workflows are also available as `.claude/commands/symfony/*` for explicit invocation.
+Deep review agents: `.claude/agents/{qa,security}-reviewer.md`.
+
+## API
+
+`GET /api/v1/cities` and `GET /api/v1/cities/{inseeCode}` — filters: `name` (partial), `exactName`, `departmentCode`, `regionCode` (exact). `postalCode` is `?string`, never `""`. Errors are RFC 7807 `application/problem+json`. Full reference (pagination, response shape, rate limiting, observability headers): `README.md`.
+
+## Verification
+
+`make lint` · `make analyse` · `make rector` · `make tests-unit` · `make tests-integration` · `make tests-api` · `make security`
+Preferred full pass: `make quality` · `make tests` · `make tests-api` · `make security`
+
+## Pull Request Process
+
+When asked to create a PR: don't push (assume already pushed), use `gh pr create` against `main`, block if the current branch is `main`/`master`/`develop`, has no commits ahead, or doesn't exist on the remote. Title from the branch's Conventional Commit. Body: what changed, why, how, what was verified, remaining risks.
+
+## AI Tool & MCP Policy
+
+MCP servers are blocked project-wide (`allowedMcpServers: []`) — any exception needs explicit team approval added to `settings.json`. Full policy: `.claude/rules/security.md` rules 10-14.
+
+## Instruction-file policy
+
+Living docs. Change only on durable evidence of drift (repeated corrections,
+Makefile/composer/structure changes, conventions that changed in practice,
+duplication). Propose first, apply only after explicit confirmation. No
+one-off/local context.

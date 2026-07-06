@@ -9,7 +9,6 @@ allowed-tools: Read, Grep, Glob
 Use this skill to review a change with a security-first lens.
 
 Read first:
-- `AGENTS.md`
 - `.claude/rules/security.md`
 - `.claude/rules/architecture.md`
 - `.claude/rules/testing.md`

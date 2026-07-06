@@ -8,7 +8,6 @@ description: Use this skill when the user asks to add, create, implement, or bui
 Use this skill to implement new functionality while staying aligned with the local project architecture.
 
 Read first:
-- `AGENTS.md`
 - `.claude/rules/architecture.md`
 - `.claude/rules/testing.md`
 - `.claude/rules/security.md`

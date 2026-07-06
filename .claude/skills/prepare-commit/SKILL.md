@@ -8,7 +8,6 @@ description: Use this skill when the user asks to prepare a commit, write a comm
 Use this skill to prepare a commit and PR context without silently performing protected git actions.
 
 Read first:
-- `AGENTS.md`
 - `Makefile`
 
 Read as needed:

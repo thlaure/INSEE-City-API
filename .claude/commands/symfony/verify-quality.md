@@ -3,7 +3,7 @@ Verify a Symfony/API Platform change using the repository's real quality gates.
 Verification scope: `$ARGUMENTS`
 
 Workflow:
-1. Read `Makefile`, `composer.json`, and `AGENTS.md`.
+1. Read `Makefile` and `composer.json`.
 2. Identify the canonical commands exposed by the repo.
 3. Prefer the project wrappers over raw vendor commands.
 4. Run the narrowest relevant tests first, then the broader required checks.

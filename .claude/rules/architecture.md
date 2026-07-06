@@ -5,7 +5,7 @@ paths:
 ---
 # Architecture Rules
 
-- Read `AGENTS.md` first. It is the canonical source of repository-specific rules.
+- Read `CLAUDE.md` first. It is the canonical source of repository-specific rules.
 - Apply SOLID principles pragmatically.
 - Prefer clean architecture and hexagonal boundaries when the repository is already structured that way.
 - If API Platform already supports the required behavior cleanly, prefer the built-in API Platform feature over extra architectural layers.

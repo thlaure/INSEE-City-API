@@ -10,7 +10,7 @@ Current diff:
 If the scope is omitted or overrides the diff above, use the scope from `$ARGUMENTS`.
 
 Review checklist:
-1. Confirm the change respects the repository architecture and `AGENTS.md`.
+1. Confirm the change respects the repository architecture and `CLAUDE.md`.
 2. Check that entrypoints remain orchestration-only.
 3. Check that business rules stay in handlers, use-cases, or domain services.
 4. Check validation at the input boundary.
