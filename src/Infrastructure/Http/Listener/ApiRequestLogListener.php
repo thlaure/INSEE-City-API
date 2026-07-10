@@ -48,11 +48,11 @@ final readonly class ApiRequestLogListener
 
         $response = $event->getResponse();
         $raw = $request->attributes->get('_request_id');
-        $requestId = \is_string($raw) ? $raw : '';
+        $requestId = is_string($raw) ? $raw : '';
         $response->headers->set('X-Request-Id', $requestId);
 
         $startTime = $request->attributes->get('_api_log_start');
-        $durationMs = \is_int($startTime)
+        $durationMs = is_int($startTime)
             ? (int) round((hrtime(true) - $startTime) / 1_000_000)
             : null;
 

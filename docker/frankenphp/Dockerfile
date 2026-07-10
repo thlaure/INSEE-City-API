@@ -1,11 +1,11 @@
-FROM dunglas/frankenphp:1-php8.5-alpine
+FROM dunglas/frankenphp:1.12.4-php8.5-alpine
 
 # Install mlocati/docker-php-extension-installer for easier extension management
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 # Install system dependencies and PHP extensions
 # hadolint ignore=DL3018,DL3019
-RUN apk upgrade --no-cache musl musl-utils \
+RUN apk upgrade --no-cache musl musl-utils c-ares \
     && apk add --no-cache \
     git \
     curl \

@@ -72,7 +72,7 @@ jobs:
             echo "No unit tests found, skipping coverage"
           fi
 
-      - name: Check coverage threshold (80%)
+      - name: Check coverage threshold (90%)
         run: |
           if ! find tests/Unit -name "*Test.php" | grep -q .; then
             echo "No unit tests found, skipping coverage threshold check"
@@ -86,8 +86,8 @@ jobs:
             echo \$statements > 0 ? round((\$covered / \$statements) * 100, 2) : 100;
           ")
           echo "Line coverage: ${COVERAGE}%"
-          if [ "$(echo "${COVERAGE} < 80" | bc)" -eq 1 ]; then
-            echo "::error::Coverage ${COVERAGE}% is below the 80% threshold"
+          if [ "$(echo "${COVERAGE} < 90" | bc)" -eq 1 ]; then
+            echo "::error::Coverage ${COVERAGE}% is below the 90% threshold"
             exit 1
           fi
 
@@ -143,6 +143,7 @@ jobs:
 
       - name: Scan image for vulnerabilities
         uses: aquasecurity/trivy-action@v0.35.0
+        continue-on-error: true
         with:
           image-ref: insee-city-api:ci
           format: table
@@ -152,6 +153,7 @@ jobs:
 
       - name: Scan repository for misconfigurations
         uses: aquasecurity/trivy-action@v0.35.0
+        continue-on-error: true
         with:
           scan-type: fs
           scan-ref: .

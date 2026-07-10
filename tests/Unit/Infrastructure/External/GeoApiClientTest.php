@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Infrastructure\External;
 
 use App\Domain\City\Exception\CityDataProviderException;
+use App\Domain\City\Model\CountryCode;
 use App\Infrastructure\External\GeoApiClient;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -45,11 +46,13 @@ final class GeoApiClientTest extends TestCase
         $cities = [...$client->fetchAllCities()];
 
         $this->assertCount(2, $cities);
-        $this->assertSame('75056', $cities[0]->inseeCode);
+        $this->assertSame(CountryCode::FR, $cities[0]->countryCode);
+        $this->assertSame('75056', $cities[0]->localCode);
         $this->assertSame('Paris', $cities[0]->name);
         $this->assertSame('75001', $cities[0]->postalCode);
         $this->assertSame('69001', $cities[1]->postalCode);
-        $this->assertSame('69123', $cities[1]->inseeCode);
+        $this->assertSame(CountryCode::FR, $cities[1]->countryCode);
+        $this->assertSame('69123', $cities[1]->localCode);
         $this->assertSame('Lyon', $cities[1]->name);
     }
 

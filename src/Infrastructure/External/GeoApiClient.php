@@ -6,6 +6,7 @@ namespace App\Infrastructure\External;
 
 use App\Domain\City\Exception\CityDataProviderException;
 use App\Domain\City\Model\City;
+use App\Domain\City\Model\CountryCode;
 use App\Domain\City\Port\CityDataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -17,6 +18,8 @@ final readonly class GeoApiClient implements CityDataProviderInterface
     private const string COMMUNES_PATH = '/communes';
 
     private const string FIELDS = 'code,nom,codeDepartement,codeRegion,codesPostaux';
+
+    private const CountryCode COUNTRY_CODE = CountryCode::FR;
 
     public function __construct(
         private HttpClientInterface $httpClient,
@@ -64,7 +67,7 @@ final readonly class GeoApiClient implements CityDataProviderInterface
      */
     private function fetchCitiesByDepartment(string $departmentCode): array
     {
-        $response = $this->httpClient->request(Request::METHOD_GET, \sprintf('%s%s/%s%s', $this->baseUrl, self::DEPARTMENTS_PATH, $departmentCode, self::COMMUNES_PATH), [
+        $response = $this->httpClient->request(Request::METHOD_GET, sprintf('%s%s/%s%s', $this->baseUrl, self::DEPARTMENTS_PATH, $departmentCode, self::COMMUNES_PATH), [
             'query' => [
                 'fields' => self::FIELDS,
                 'format' => 'json',
@@ -83,7 +86,7 @@ final readonly class GeoApiClient implements CityDataProviderInterface
      */
     private function mapCity(array $rawCity, int $index): City
     {
-        $inseeCode = $this->requireStringField($rawCity, 'code', $index);
+        $localCode = $this->requireStringField($rawCity, 'code', $index);
         $name = $this->requireStringField($rawCity, 'nom', $index);
         $departmentCode = $this->requireStringField($rawCity, 'codeDepartement', $index);
         $regionCode = $this->requireStringField($rawCity, 'codeRegion', $index);
@@ -91,7 +94,8 @@ final readonly class GeoApiClient implements CityDataProviderInterface
         $now = new \DateTimeImmutable();
 
         return new City(
-            inseeCode: $inseeCode,
+            countryCode: self::COUNTRY_CODE,
+            localCode: $localCode,
             name: $name,
             departmentCode: $departmentCode,
             regionCode: $regionCode,
@@ -106,8 +110,8 @@ final readonly class GeoApiClient implements CityDataProviderInterface
      */
     private function requireStringField(array $rawCity, string $field, int $index): string
     {
-        if (!\array_key_exists($field, $rawCity) || !\is_string($rawCity[$field]) || '' === trim($rawCity[$field])) {
-            throw new \UnexpectedValueException(\sprintf('Invalid "%s" field for city payload at index %d.', $field, $index));
+        if (!array_key_exists($field, $rawCity) || !is_string($rawCity[$field]) || '' === trim($rawCity[$field])) {
+            throw new \UnexpectedValueException(sprintf('Invalid "%s" field for city payload at index %d.', $field, $index));
         }
 
         return $rawCity[$field];
@@ -119,8 +123,8 @@ final readonly class GeoApiClient implements CityDataProviderInterface
             return null;
         }
 
-        if (!\is_array($postalCodes)) {
-            throw new \UnexpectedValueException(\sprintf('Invalid "codesPostaux" field for city payload at index %d.', $index));
+        if (!is_array($postalCodes)) {
+            throw new \UnexpectedValueException(sprintf('Invalid "codesPostaux" field for city payload at index %d.', $index));
         }
 
         if ([] === $postalCodes) {
@@ -129,8 +133,8 @@ final readonly class GeoApiClient implements CityDataProviderInterface
 
         $firstPostalCode = $postalCodes[0] ?? null;
 
-        if (!\is_string($firstPostalCode)) {
-            throw new \UnexpectedValueException(\sprintf('Invalid first postal code for city payload at index %d.', $index));
+        if (!is_string($firstPostalCode)) {
+            throw new \UnexpectedValueException(sprintf('Invalid first postal code for city payload at index %d.', $index));
         }
 
         return $firstPostalCode;

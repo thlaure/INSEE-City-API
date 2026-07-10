@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Behat;
 
+use App\Domain\City\Model\CountryCode;
 use App\Entity\City;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
@@ -31,10 +32,11 @@ final readonly class CityFixtureContext implements Context
     {
         foreach ($table->getHash() as $row) {
             $city = new City(
-                inseeCode: $row['inseeCode'],
+                countryCode: CountryCode::from($row['countryCode']),
+                localCode: $row['localCode'],
                 name: $row['name'],
-                departmentCode: $row['departmentCode'],
-                regionCode: $row['regionCode'],
+                departmentCode: '' !== $row['departmentCode'] ? $row['departmentCode'] : null,
+                regionCode: '' !== $row['regionCode'] ? $row['regionCode'] : null,
                 postalCode: '' !== $row['postalCode'] ? ($row['postalCode'] ?? null) : null,
                 createdAt: new \DateTimeImmutable(),
             );
