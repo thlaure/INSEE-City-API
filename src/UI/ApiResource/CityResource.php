@@ -11,17 +11,24 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\QueryParameter;
+use App\Domain\City\Model\CountryCode;
 use App\Entity\City;
 use App\Infrastructure\Http\Provider\CityCollectionProvider;
 use App\Infrastructure\Http\Provider\CityItemProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ApiResource(shortName: 'City', operations: [
     new Get(
-        uriTemplate: '/cities/{inseeCode}',
+        uriTemplate: '/cities/{countryCode}/{localCode}',
+        uriVariables: [
+            'countryCode' => new Link(fromClass: self::class, identifiers: ['countryCode']),
+            'localCode' => new Link(fromClass: self::class, identifiers: ['localCode']),
+        ],
         provider: CityItemProvider::class,
     ),
     new GetCollection(
@@ -56,6 +63,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
                 ],
                 castToArray: false,
             ),
+            'countryCode' => new QueryParameter(
+                schema: ['type' => 'string'],
+                filter: new ExactFilter(),
+                property: 'countryCode',
+                description: 'Exact match on the country code.',
+                constraints: [
+                    new NotBlank(message: 'The "countryCode" filter must not be blank. Omit the parameter to disable this filter.', allowNull: true),
+                    new Length(max: 2),
+                    new Choice(callback: [CountryCode::class, 'values'], message: 'The "countryCode" filter must be a valid ISO 3166-1 alpha-2 country code.'),
+                ],
+                castToArray: false,
+            ),
             'departmentCode' => new QueryParameter(
                 schema: ['type' => 'string'],
                 filter: new ExactFilter(),
@@ -86,13 +105,16 @@ final readonly class CityResource
     public function __construct(
         #[ApiProperty(identifier: true)]
         #[Groups(['city:read'])]
-        public string $inseeCode,
+        public CountryCode $countryCode,
+        #[ApiProperty(identifier: true)]
+        #[Groups(['city:read'])]
+        public string $localCode,
         #[Groups(['city:read'])]
         public string $name,
         #[Groups(['city:read'])]
-        public string $departmentCode,
+        public ?string $departmentCode,
         #[Groups(['city:read'])]
-        public string $regionCode,
+        public ?string $regionCode,
         #[Groups(['city:read'])]
         public ?string $postalCode,
     ) {
@@ -101,7 +123,8 @@ final readonly class CityResource
     public static function fromEntity(City $entity): self
     {
         return new self(
-            inseeCode: $entity->getInseeCode(),
+            countryCode: $entity->getCountryCode(),
+            localCode: $entity->getLocalCode(),
             name: $entity->getName(),
             departmentCode: $entity->getDepartmentCode(),
             regionCode: $entity->getRegionCode(),

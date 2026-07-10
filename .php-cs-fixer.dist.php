@@ -20,6 +20,7 @@ return new Config()
         'declare_strict_types' => true,
         'method_argument_space' => ['on_multiline' => 'ensure_fully_multiline'],
         'array_syntax' => ['syntax' => 'short'],
+        'native_function_invocation' => ['include' => [], 'strict' => true],
     ])
     ->setRiskyAllowed(true)
     ->setFinder($finder)

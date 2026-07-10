@@ -37,7 +37,7 @@ final class ImportCitiesCommand extends Command
             return Command::FAILURE;
         }
 
-        $io->success(\sprintf(
+        $io->success(sprintf(
             'Import complete. Created: %d | Updated: %d | Total processed: %d',
             $result->created,
             $result->updated,

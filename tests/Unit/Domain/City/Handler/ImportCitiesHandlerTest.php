@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Domain\City\Handler;
 use App\Application\City\Handler\ImportCitiesHandler;
 use App\Domain\City\Exception\CityDataProviderException;
 use App\Domain\City\Model\City;
+use App\Domain\City\Model\CountryCode;
 use App\Domain\City\Port\CityDataProviderInterface;
 use App\Domain\City\Port\CityRepositoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -91,7 +92,7 @@ final class ImportCitiesHandlerTest extends TestCase
         $cities = [];
 
         for ($i = 0; $i < 100; ++$i) {
-            $cities[] = $this->makeCity(\sprintf('75%03d', $i), \sprintf('Paris %d', $i), '75', '11', '');
+            $cities[] = $this->makeCity(sprintf('75%03d', $i), sprintf('Paris %d', $i), '75', '11', '');
         }
 
         $this->dataProvider->expects($this->once())
@@ -121,14 +122,15 @@ final class ImportCitiesHandlerTest extends TestCase
     }
 
     private function makeCity(
-        string $inseeCode,
+        string $localCode,
         string $name,
         string $departmentCode,
         string $regionCode,
         string $postalCode,
     ): City {
         return new City(
-            inseeCode: $inseeCode,
+            countryCode: CountryCode::FR,
+            localCode: $localCode,
             name: $name,
             departmentCode: $departmentCode,
             regionCode: $regionCode,

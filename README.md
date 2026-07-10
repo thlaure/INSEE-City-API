@@ -70,7 +70,7 @@ Local ports:
 | Method | Path | Description |
 |---|---|---|
 | `GET` | `/api/v1/cities` | Paginated city collection |
-| `GET` | `/api/v1/cities/{inseeCode}` | Single city by INSEE code |
+| `GET` | `/api/v1/cities/{countryCode}/{localCode}` | Single city by country code and local city code |
 | `GET` | `/health` | Health check (DB connectivity) |
 
 ### Collection Filters
@@ -81,6 +81,7 @@ All filters are optional. Omitting a filter returns all cities.
 |---|---|---|---|
 | `name` | string | Partial | `?name=par` |
 | `exactName` | string | Exact | `?exactName=Paris` |
+| `countryCode` | string | Exact | `?countryCode=FR` |
 | `departmentCode` | string | Exact | `?departmentCode=75` |
 | `regionCode` | string | Exact | `?regionCode=11` |
 
@@ -98,10 +99,11 @@ City resource fields:
 
 | Field | Type | Notes |
 |---|---|---|
-| `inseeCode` | string | INSEE commune code, used as identifier |
+| `countryCode` | string | ISO 3166-1 alpha-2 country code (e.g. `FR`), part of the identifier. Validated against the full ISO list at write time and on the `countryCode` filter. |
+| `localCode` | string | Country-local city code (e.g. INSEE commune code for France), part of the identifier |
 | `name` | string | City name |
-| `departmentCode` | string | Department code |
-| `regionCode` | string | Region code |
+| `departmentCode` | string\|null | Department code, `null` if not applicable for the country |
+| `regionCode` | string\|null | Region code, `null` if not applicable for the country |
 | `postalCode` | string\|null | First postal code, `null` if unavailable |
 
 Example response (`application/ld+json`):
@@ -109,9 +111,10 @@ Example response (`application/ld+json`):
 ```json
 {
   "@context": "/api/v1/contexts/City",
-  "@id": "/api/v1/cities/75056",
+  "@id": "/api/v1/cities/FR/75056",
   "@type": "City",
-  "inseeCode": "75056",
+  "countryCode": "FR",
+  "localCode": "75056",
   "name": "Paris",
   "departmentCode": "75",
   "regionCode": "11",
@@ -202,7 +205,7 @@ HTTP Request → API Platform → Doctrine ORM → City (entity) → JSON-LD res
 make import
 ```
 
-Fetches all French communes from `geo.api.gouv.fr` department by department to avoid loading the full dataset into memory at once. Existing records are updated via upsert on `insee_code`.
+Fetches all French communes from `geo.api.gouv.fr` department by department to avoid loading the full dataset into memory at once, tagged with `country_code = 'FR'`. Existing records are updated via upsert on `(country_code, local_code)`.
 
 ## Main Commands
 
