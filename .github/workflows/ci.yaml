@@ -170,13 +170,13 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Lint Dockerfile (dev)
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: docker/frankenphp/Dockerfile.dev
           failure-threshold: error
 
       - name: Lint Dockerfile (prod)
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: docker/frankenphp/Dockerfile
           failure-threshold: error
