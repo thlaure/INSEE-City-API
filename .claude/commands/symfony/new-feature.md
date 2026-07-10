@@ -9,8 +9,9 @@ Execution order:
 3. **TDD phase — write tests first, implement second:**
    a. Write the Behat scenario(s) covering the expected API behavior. Stop and present them. Wait for explicit approval before continuing.
    b. Write unit test function signatures (method names, arrange/act/assert structure, no body yet). Stop and present them. Wait for explicit approval before continuing.
-   c. Fill in the unit test bodies. Stop and present them. Wait for explicit approval before continuing.
-   d. Only after all tests are approved: implement the feature code to make the tests pass.
+   c. Fill in the unit test bodies. Run them and confirm they fail (RED) — they reference behavior that doesn't exist yet. A drafted test that already passes proves nothing; fix it before continuing. Stop and present the test files plus the RED confirmation. Wait for explicit approval before continuing.
+   d. Only after all tests are approved: implement the feature code until the gates pass (GREEN).
+   e. Refactor with tests kept green — structure only, no behavior change. Skip explicitly if nothing needs cleanup.
 4. Run the repository quality gates before reporting completion.
 
 Default expectations unless the repo clearly differs:

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\ApiResource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -58,20 +59,28 @@ use Symfony\Component\Validator\Constraints\Range;
 final readonly class AddressResource
 {
     public function __construct(
+        #[ApiProperty(description: 'Full formatted address, as returned by Photon.', example: '10 Rue de la Paix, 75002 Paris')]
         #[Groups(['address:read'])]
         public string $label,
+        #[ApiProperty(description: 'House number, null if Photon has no house-number-level match.', example: '10')]
         #[Groups(['address:read'])]
         public ?string $houseNumber,
+        #[ApiProperty(description: 'Street name, null if Photon has no street-level match.', example: 'Rue de la Paix')]
         #[Groups(['address:read'])]
         public ?string $street,
+        #[ApiProperty(description: 'Postal code, null if unavailable for this result.', example: '75002')]
         #[Groups(['address:read'])]
         public ?string $postalCode,
+        #[ApiProperty(description: 'City name, null if unavailable for this result.', example: 'Paris')]
         #[Groups(['address:read'])]
         public ?string $city,
+        #[ApiProperty(description: "ISO 3166-1 alpha-2 country code, null if Photon doesn't return one for this result.", example: 'FR')]
         #[Groups(['address:read'])]
         public ?string $countryCode,
+        #[ApiProperty(description: 'Latitude, between -90 and 90.', example: 48.8689953)]
         #[Groups(['address:read'])]
         public float $latitude,
+        #[ApiProperty(description: 'Longitude, between -180 and 180.', example: 2.3311419)]
         #[Groups(['address:read'])]
         public float $longitude,
     ) {
