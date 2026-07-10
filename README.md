@@ -18,6 +18,7 @@ Symfony/API Platform API exposing city data for any country (identified by ISO 3
 - [Extending Data Sources](#extending-data-sources)
   - [Adding a new country's cities](#adding-a-new-countrys-cities)
   - [Extending address search coverage](#extending-address-search-coverage)
+- [Operations](#operations)
 - [Main Commands](#main-commands)
 - [Agent Docs](#agent-docs)
 
@@ -95,6 +96,10 @@ Local ports:
 | `GET` | `/api/v1/cities/{countryCode}/{localCode}` | Single city by country code and local city code |
 | `GET` | `/api/v1/addresses/search` | Address autocomplete (any country, via Photon) |
 | `GET` | `/health` | Health check (DB connectivity) |
+
+### Authentication
+
+None. Every endpoint above is fully public and unauthenticated by design — this is a read-only reference API with no user data and no state-changing operations. Access control is limited to the global per-IP [rate limit](#rate-limiting). If you need to restrict access (e.g. an internal-only deployment), put it behind your own gateway/auth layer; nothing in this app enforces it.
 
 ### Collection Filters
 
@@ -307,6 +312,45 @@ Useful links:
 - [komoot/photon](https://github.com/komoot/photon) — the Photon project itself
 
 Per `CLAUDE.md`, changing the external city data source strategy needs review/confirmation first.
+
+## Operations
+
+This repo documents local Docker Compose development in detail; it does **not** currently document or automate a production deployment target (no Kubernetes manifests, no CD pipeline — CI only lints/tests/scans, see `.github/workflows/ci.yaml`). The notes below are what you need to know if you deploy this yourself.
+
+### Resource sizing (measured, not estimated)
+
+| Service | Idle RAM | Disk |
+|---|---|---|
+| `app` (FrankenPHP) | ~150MB | — |
+| `database` (Postgres) | ~90MB | grows with imported cities (France + Germany: low hundreds of MB) |
+| `photon` (address search) | ~830MB | ~6.4GB (France+Monaco OSM index) |
+
+Numbers are from `docker stats` on the France+Monaco index configuration. RAM for `photon` scales with index size — a larger [Photon index](#extending-address-search-coverage) (continental/planet-wide) needs proportionally more.
+
+### Photon must not be publicly reachable
+
+`docker-compose.yml`'s `ports: ["2322:2322"]` on the `photon` service is a **local dev convenience** (lets you `curl localhost:2322` directly to debug it). Photon has no authentication of its own. In any real deployment, do not publish that port externally — `PhotonClient` only needs to reach it over the internal Docker network (`http://photon:2322`, matching `PHOTON_BASE_URL`'s default); nothing external should.
+
+### Database migrations
+
+Migrations are Doctrine Migrations (`migrations/`), run via `docker compose exec app php bin/console doctrine:migrations:migrate --no-interaction` (what `make db-migrate` does locally). There is no automated migrate-on-deploy step in this repo — run it explicitly as part of whatever deploy process you build, before traffic hits the new version.
+
+### Backup / restore (Postgres)
+
+No backup automation exists in this repo. Manually, against the compose setup:
+
+```bash
+docker compose exec database pg_dump -U insee insee_city > backup.sql
+docker compose exec -T database psql -U insee insee_city < backup.sql
+```
+
+### CORS
+
+`CORS_ALLOW_ORIGIN` (see [Environment Variables](#environment-variables)) defaults to a localhost-only regex for dev. Set it to your actual production origin(s) when deploying — the default would reject every real browser client.
+
+### Metrics
+
+None beyond the structured `api_access` log (see [Observability](#observability)) — no `/metrics` endpoint, no APM integration currently.
 
 ## Main Commands
 
