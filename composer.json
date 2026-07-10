@@ -19,7 +19,7 @@
         "nelmio/cors-bundle": "^2.6",
         "runtime/frankenphp-symfony": "^0.2",
         "symfony/console": "7.4.*",
-        "symfony/dotenv": "7.4.*",
+        "symfony/dotenv": "8.1.*",
         "symfony/flex": "^2.11",
         "symfony/framework-bundle": "7.4.*",
         "symfony/http-client": "7.4.*",
