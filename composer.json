@@ -17,7 +17,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6.7",
         "nelmio/cors-bundle": "^2.6",
-        "runtime/frankenphp-symfony": "^0.2",
+        "runtime/frankenphp-symfony": "^1.0",
         "symfony/console": "7.4.*",
         "symfony/dotenv": "7.4.*",
         "symfony/flex": "^2.11",
