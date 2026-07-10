@@ -26,4 +26,13 @@ final class CountryCodeTest extends TestCase
     {
         $this->assertNull(CountryCode::tryFrom('XX'));
     }
+
+    public function testValuesReturnsAllIsoCodes(): void
+    {
+        $values = CountryCode::values();
+
+        $this->assertContains('FR', $values);
+        $this->assertContains('DE', $values);
+        $this->assertCount(count(CountryCode::cases()), $values);
+    }
 }

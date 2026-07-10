@@ -1,8 +1,8 @@
-# INSEE City API
+# World Cities API
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/thomaslaure)
 
-Symfony/API Platform API exposing French city data from the French commune dataset at [geo.api.gouv.fr](https://geo.api.gouv.fr).
+Symfony/API Platform API exposing city data for any country (identified by ISO 3166-1 alpha-2 country code). France is currently imported from the French commune dataset at [geo.api.gouv.fr](https://geo.api.gouv.fr).
 
 ## Overview
 

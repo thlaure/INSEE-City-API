@@ -81,6 +81,40 @@ final class CityTest extends TestCase
         );
     }
 
+    public function testConstructorRejectsEmptyDepartmentCode(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('City department code must not be empty.');
+
+        new City(
+            countryCode: CountryCode::FR,
+            localCode: '75056',
+            name: 'Paris',
+            departmentCode: '',
+            regionCode: '11',
+            postalCode: '75001',
+            createdAt: new \DateTimeImmutable(),
+            updatedAt: new \DateTimeImmutable(),
+        );
+    }
+
+    public function testConstructorRejectsEmptyRegionCode(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('City region code must not be empty.');
+
+        new City(
+            countryCode: CountryCode::FR,
+            localCode: '75056',
+            name: 'Paris',
+            departmentCode: '75',
+            regionCode: '',
+            postalCode: '75001',
+            createdAt: new \DateTimeImmutable(),
+            updatedAt: new \DateTimeImmutable(),
+        );
+    }
+
     public function testConstructorRejectsEmptyName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
