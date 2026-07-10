@@ -160,7 +160,7 @@ console: ## Run Symfony console command (usage: make console CMD="cache:clear")
 ## —— City Import —————————————————————————————————————————————————————————————
 
 import: ## Run the city import command (every tagged data provider)
-	symfony php -d memory_limit=512M bin/console app:import-cities
+	docker compose exec app php -d memory_limit=512M bin/console app:import-cities
 
 ## —— API Platform ————————————————————————————————————————————————————————————
 
