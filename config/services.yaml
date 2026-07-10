@@ -28,7 +28,7 @@ services:
     App\Infrastructure\External\GeoApiClient:
         arguments:
             $baseUrl: '%env(INSEE_API_BASE_URL)%'
-        tags: ['app.city_data_provider']
+        tags: [!php/const App\Domain\City\Port\CityDataProviderInterface::TAG]
 
     # GeoNamesClient is reusable across any GeoNames-covered country (download.geonames.org) —
     # only $countryCode differs between instances. Adding another country's cities via
@@ -42,8 +42,10 @@ services:
         parent: App\Infrastructure\External\GeoNamesClient
         arguments:
             $countryCode: !php/enum App\Domain\Shared\Model\CountryCode::DE
-        tags: ['app.city_data_provider']
+        tags: [!php/const App\Domain\City\Port\CityDataProviderInterface::TAG]
 
+    # If you rename CityDataProviderInterface::TAG, update this literal too —
+    # !tagged_iterator can't reference a PHP constant directly.
     App\Application\City\Handler\ImportCitiesHandler:
         arguments:
             $dataProviders: !tagged_iterator app.city_data_provider

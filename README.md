@@ -123,7 +123,7 @@ City resource fields:
 | Field | Type | Notes |
 |---|---|---|
 | `countryCode` | string | ISO 3166-1 alpha-2 country code (e.g. `FR`), part of the identifier. Validated against the full ISO list at write time and on the `countryCode` filter. |
-| `localCode` | string | Country-local city code (e.g. INSEE commune code for France), part of the identifier |
+| `localCode` | string | Country-local city code, part of the identifier. Semantics are provider-defined, not a portable government code for every country: France's is the official INSEE commune code, Germany's is GeoNames' internal `geonameid` (an arbitrary numeric ID, not an administrative code) |
 | `name` | string | City name |
 | `departmentCode` | string\|null | Department code, `null` if not applicable for the country |
 | `regionCode` | string\|null | Region code, `null` if not applicable for the country |
@@ -156,8 +156,8 @@ GET /api/v1/addresses/search?q=10+rue+de+la+paix+paris&countryCode=FR&limit=5
 | Parameter | Type | Required | Notes |
 |---|---|---|---|
 | `q` | string | yes | Partial or full-text address query |
-| `countryCode` | string | no | Restrict results to this ISO 3166-1 alpha-2 country code |
-| `limit` | integer | no | 1-20, default 10. Photon has no server-side country filter, so when `countryCode` is set, results are fetched then filtered client-side — the returned list may be shorter than `limit` in that case |
+| `countryCode` | string | no | Restrict results to this ISO 3166-1 alpha-2 country code. **Known limitation**: Photon has no server-side country filter, so this is applied client-side *after* Photon has already ranked and truncated to `limit` global matches — a query whose top worldwide matches are mostly outside the target country can come back empty or short even when good matches exist further down Photon's ranking |
+| `limit` | integer | no | 1-20, default 10 |
 
 Address resource fields: `label`, `houseNumber`, `street`, `postalCode`, `city`, `countryCode`, `latitude`, `longitude` (all nullable except `label`/`latitude`/`longitude`).
 
@@ -289,6 +289,8 @@ App\Infrastructure\External\GeoNamesClient.<CODE>:
         $countryCode: !php/enum App\Domain\Shared\Model\CountryCode::<CODE>
     tags: ['app.city_data_provider']
 ```
+
+**Memory tradeoff**: unlike `GeoApiClient` (which deliberately fetches France department by department to avoid loading the full dataset at once), `GeoNamesClient` reads its target country's entire per-country file into memory in one pass. Fine for Germany (~82k populated places), but check `memory_limit` before adding a much larger country this way (e.g. the US) — this "no new class" config-only story doesn't come with a memory guard rail.
 
 Useful links:
 - [GeoNames per-country dumps](https://download.geonames.org/export/dump/) — one `.zip` per ISO country code

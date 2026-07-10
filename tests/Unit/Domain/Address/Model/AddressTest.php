@@ -69,4 +69,38 @@ final class AddressTest extends TestCase
             longitude: 0.0,
         );
     }
+
+    public function testConstructorRejectsOutOfRangeLatitude(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Address latitude must be between -90 and 90.');
+
+        new Address(
+            label: 'Somewhere',
+            houseNumber: null,
+            street: null,
+            postalCode: null,
+            city: null,
+            countryCode: null,
+            latitude: 90.1,
+            longitude: 0.0,
+        );
+    }
+
+    public function testConstructorRejectsOutOfRangeLongitude(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Address longitude must be between -180 and 180.');
+
+        new Address(
+            label: 'Somewhere',
+            houseNumber: null,
+            street: null,
+            postalCode: null,
+            city: null,
+            countryCode: null,
+            latitude: 0.0,
+            longitude: -180.1,
+        );
+    }
 }
