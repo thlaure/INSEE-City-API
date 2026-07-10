@@ -103,18 +103,22 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 final readonly class CityResource
 {
     public function __construct(
-        #[ApiProperty(identifier: true)]
+        #[ApiProperty(description: 'ISO 3166-1 alpha-2 country code, part of the identifier. Validated against the full ISO list at write time and on the countryCode filter.', identifier: true, example: 'FR')]
         #[Groups(['city:read'])]
         public CountryCode $countryCode,
-        #[ApiProperty(identifier: true)]
+        #[ApiProperty(description: "Country-local city code, part of the identifier. Semantics are provider-defined, not a portable government code for every country: France's is the official INSEE commune code, Germany's is GeoNames' internal geonameid (an arbitrary numeric ID, not an administrative code).", identifier: true, example: '75056')]
         #[Groups(['city:read'])]
         public string $localCode,
+        #[ApiProperty(description: 'City name.', example: 'Paris')]
         #[Groups(['city:read'])]
         public string $name,
+        #[ApiProperty(description: 'Department code, null if not applicable for the country.', example: '75')]
         #[Groups(['city:read'])]
         public ?string $departmentCode,
+        #[ApiProperty(description: 'Region code, null if not applicable for the country.', example: '11')]
         #[Groups(['city:read'])]
         public ?string $regionCode,
+        #[ApiProperty(description: 'First postal code, null if unavailable.', example: '75001')]
         #[Groups(['city:read'])]
         public ?string $postalCode,
     ) {
