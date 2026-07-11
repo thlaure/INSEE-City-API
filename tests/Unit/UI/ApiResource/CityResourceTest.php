@@ -7,10 +7,12 @@ namespace App\Tests\Unit\UI\ApiResource;
 use App\Domain\Shared\Model\CountryCode;
 use App\Entity\City;
 use App\UI\ApiResource\CityResource;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 final class CityResourceTest extends TestCase
 {
+    #[Test]
     public function testFromEntityMapsAllFields(): void
     {
         $entity = new City(
@@ -32,6 +34,7 @@ final class CityResourceTest extends TestCase
         self::assertSame('75001', $resource->postalCode);
     }
 
+    #[Test]
     public function testFromEntityMapsNullPostalCode(): void
     {
         $entity = new City(
@@ -47,6 +50,7 @@ final class CityResourceTest extends TestCase
         self::assertNull($resource->postalCode);
     }
 
+    #[Test]
     public function testFromEntityMapsNullDepartmentAndRegionCodes(): void
     {
         $entity = new City(

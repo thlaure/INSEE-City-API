@@ -13,6 +13,7 @@ use App\Domain\Address\Port\AddressProviderInterface;
 use App\Domain\Shared\Model\CountryCode;
 use App\Infrastructure\Http\Provider\AddressSearchProvider;
 use App\UI\ApiResource\Exception\AddressSearchUnavailableException;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -29,6 +30,7 @@ final class AddressSearchProviderTest extends TestCase
         $this->provider = new AddressSearchProvider($this->addressProvider, new NullLogger());
     }
 
+    #[Test]
     public function testProvideReadsParametersAndMapsResults(): void
     {
         $address = new Address(
@@ -54,6 +56,7 @@ final class AddressSearchProviderTest extends TestCase
         $this->assertSame('FR', $resources[0]->countryCode);
     }
 
+    #[Test]
     public function testProvideDefaultsLimitWhenMissing(): void
     {
         $this->addressProvider->expects($this->once())
@@ -64,6 +67,7 @@ final class AddressSearchProviderTest extends TestCase
         $this->provider->provide($this->operationWith(q: 'paris'));
     }
 
+    #[Test]
     public function testProvideClampsLimitAboveMaximum(): void
     {
         $this->addressProvider->expects($this->once())
@@ -74,6 +78,7 @@ final class AddressSearchProviderTest extends TestCase
         $this->provider->provide($this->operationWith(q: 'paris', limit: '500'));
     }
 
+    #[Test]
     public function testProvideClampsLimitBelowMinimum(): void
     {
         $this->addressProvider->expects($this->once())
@@ -84,6 +89,7 @@ final class AddressSearchProviderTest extends TestCase
         $this->provider->provide($this->operationWith(q: 'paris', limit: '0'));
     }
 
+    #[Test]
     public function testProvideThrowsUnavailableExceptionWhenProviderFails(): void
     {
         $this->addressProvider->method('searchAddresses')

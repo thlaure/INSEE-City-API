@@ -10,6 +10,7 @@ use App\Domain\City\Model\City;
 use App\Domain\City\Port\CityDataProviderInterface;
 use App\Domain\City\Port\CityRepositoryInterface;
 use App\Domain\Shared\Model\CountryCode;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -28,6 +29,7 @@ final class ImportCitiesHandlerTest extends TestCase
         $this->handler = new ImportCitiesHandler([$this->dataProvider], $this->cityRepository);
     }
 
+    #[Test]
     public function testInvokeWithEmptyDataReturnsZeroTotals(): void
     {
         $this->dataProvider->expects($this->once())
@@ -41,6 +43,7 @@ final class ImportCitiesHandlerTest extends TestCase
         $this->assertSame(0, $result->totalProcessed);
     }
 
+    #[Test]
     public function testInvokeCreatesNewCitiesAndReturnsCounts(): void
     {
         $cities = [
@@ -63,6 +66,7 @@ final class ImportCitiesHandlerTest extends TestCase
         $this->assertSame(2, $result->totalProcessed);
     }
 
+    #[Test]
     public function testInvokeUpdatesExistingCitiesAndReturnsCounts(): void
     {
         $cities = [
@@ -84,6 +88,7 @@ final class ImportCitiesHandlerTest extends TestCase
         $this->assertSame(1, $result->totalProcessed);
     }
 
+    #[Test]
     public function testInvokeThrowsWhenDataProviderFails(): void
     {
         $this->dataProvider->expects($this->once())
@@ -95,6 +100,7 @@ final class ImportCitiesHandlerTest extends TestCase
         ($this->handler)();
     }
 
+    #[Test]
     public function testInvokeAggregatesAcrossMultipleProviders(): void
     {
         $franceProvider = $this->createMock(CityDataProviderInterface::class);
@@ -123,6 +129,7 @@ final class ImportCitiesHandlerTest extends TestCase
         $this->assertSame(3, $result->totalProcessed);
     }
 
+    #[Test]
     public function testInvokeCallsProgressCallbacksWithExpectedArguments(): void
     {
         $cities = [

@@ -6,10 +6,12 @@ namespace App\Tests\Unit\Domain\City\Model;
 
 use App\Domain\City\Model\City;
 use App\Domain\Shared\Model\CountryCode;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 final class CityTest extends TestCase
 {
+    #[Test]
     public function testConstructorCreatesCityWithValidData(): void
     {
         $city = new City(
@@ -31,6 +33,7 @@ final class CityTest extends TestCase
         $this->assertSame('75001', $city->postalCode);
     }
 
+    #[Test]
     public function testConstructorAllowsNullPostalCode(): void
     {
         $city = new City(
@@ -47,6 +50,7 @@ final class CityTest extends TestCase
         $this->assertNull($city->postalCode);
     }
 
+    #[Test]
     public function testConstructorAllowsNullDepartmentAndRegionCodes(): void
     {
         $city = new City(
@@ -64,6 +68,7 @@ final class CityTest extends TestCase
         $this->assertNull($city->regionCode);
     }
 
+    #[Test]
     public function testConstructorRejectsEmptyLocalCode(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -81,6 +86,7 @@ final class CityTest extends TestCase
         );
     }
 
+    #[Test]
     public function testConstructorRejectsEmptyDepartmentCode(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -98,6 +104,7 @@ final class CityTest extends TestCase
         );
     }
 
+    #[Test]
     public function testConstructorRejectsEmptyRegionCode(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -115,6 +122,7 @@ final class CityTest extends TestCase
         );
     }
 
+    #[Test]
     public function testConstructorRejectsEmptyName(): void
     {
         $this->expectException(\InvalidArgumentException::class);

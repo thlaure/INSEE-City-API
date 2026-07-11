@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Infrastructure\External;
 use App\Domain\Address\Exception\AddressProviderException;
 use App\Domain\Shared\Model\CountryCode;
 use App\Infrastructure\External\PhotonClient;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -48,6 +49,7 @@ final class PhotonClientTest extends TestCase
         }
         JSON;
 
+    #[Test]
     public function testSearchAddressesMapsHouseFeatureToDomainAddress(): void
     {
         $client = new PhotonClient(new MockHttpClient([new MockResponse(self::HOUSE_FEATURE_RESPONSE)]), 'https://photon.example.test');
@@ -66,6 +68,7 @@ final class PhotonClientTest extends TestCase
         $this->assertSame(2.3311419, $address->longitude);
     }
 
+    #[Test]
     public function testSearchAddressesUsesNameWhenPresent(): void
     {
         $response = json_encode([
@@ -88,6 +91,7 @@ final class PhotonClientTest extends TestCase
         $this->assertSame('Eiffel Tower', $addresses[0]->label);
     }
 
+    #[Test]
     public function testSearchAddressesFiltersByCountryCodeClientSide(): void
     {
         $response = json_encode([
@@ -106,6 +110,7 @@ final class PhotonClientTest extends TestCase
         $this->assertSame(CountryCode::DE, $addresses[0]->countryCode);
     }
 
+    #[Test]
     public function testSearchAddressesReturnsNullCountryCodeForUnrecognizedCode(): void
     {
         $response = json_encode([
@@ -121,6 +126,7 @@ final class PhotonClientTest extends TestCase
         $this->assertNull($addresses[0]->countryCode);
     }
 
+    #[Test]
     public function testSearchAddressesThrowsWhenTransportFails(): void
     {
         $client = new PhotonClient(new MockHttpClient([new MockResponse('not json')]), 'https://photon.example.test');

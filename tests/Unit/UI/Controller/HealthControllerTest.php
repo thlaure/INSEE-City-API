@@ -6,11 +6,13 @@ namespace App\Tests\Unit\UI\Controller;
 
 use App\UI\Controller\HealthController;
 use Doctrine\DBAL\Connection;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 final class HealthControllerTest extends TestCase
 {
+    #[Test]
     public function testInvokeReturnsOkWhenDatabaseIsReachable(): void
     {
         $connection = $this->createMock(Connection::class);
@@ -27,6 +29,7 @@ final class HealthControllerTest extends TestCase
         self::assertSame('{"status":"ok"}', $response->getContent());
     }
 
+    #[Test]
     public function testInvokeReturnsServiceUnavailableWhenDatabaseFails(): void
     {
         $connection = $this->createMock(Connection::class);

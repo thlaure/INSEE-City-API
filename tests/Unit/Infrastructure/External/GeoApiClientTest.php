@@ -7,12 +7,14 @@ namespace App\Tests\Unit\Infrastructure\External;
 use App\Domain\City\Exception\CityDataProviderException;
 use App\Domain\Shared\Model\CountryCode;
 use App\Infrastructure\External\GeoApiClient;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 final class GeoApiClientTest extends TestCase
 {
+    #[Test]
     public function testFetchAllCitiesMapsValidPayloadToDomainCities(): void
     {
         $client = new GeoApiClient(
@@ -56,6 +58,7 @@ final class GeoApiClientTest extends TestCase
         $this->assertSame('Lyon', $cities[1]->name);
     }
 
+    #[Test]
     public function testFetchAllCitiesThrowsWhenPayloadIsMissingRequiredFields(): void
     {
         $client = new GeoApiClient(
@@ -81,6 +84,7 @@ final class GeoApiClientTest extends TestCase
         [...$client->fetchAllCities()];
     }
 
+    #[Test]
     public function testFetchAllCitiesThrowsWhenDepartmentPayloadIsInvalid(): void
     {
         $client = new GeoApiClient(
