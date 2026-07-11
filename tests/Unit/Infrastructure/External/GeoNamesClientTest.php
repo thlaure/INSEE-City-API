@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Infrastructure\External;
 use App\Domain\City\Exception\CityDataProviderException;
 use App\Domain\Shared\Model\CountryCode;
 use App\Infrastructure\External\GeoNamesClient;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -21,6 +22,7 @@ final class GeoNamesClientTest extends TestCase
      */
     private const string FIXTURE_PATH = __DIR__.'/../../../Fixtures/geonames-de-sample.zip';
 
+    #[Test]
     public function testFetchAllCitiesMapsPopulatedPlacesAndFiltersOthers(): void
     {
         $client = new GeoNamesClient(
@@ -46,6 +48,7 @@ final class GeoNamesClientTest extends TestCase
         $this->assertSame('051', $cities[1]->departmentCode);
     }
 
+    #[Test]
     public function testFetchAllCitiesMapsEmptyAdminCodeToNull(): void
     {
         $client = new GeoNamesClient(
@@ -61,6 +64,7 @@ final class GeoNamesClientTest extends TestCase
         $this->assertNull($cities[2]->departmentCode);
     }
 
+    #[Test]
     public function testFetchAllCitiesThrowsWhenTransportFails(): void
     {
         $client = new GeoNamesClient(
@@ -74,6 +78,7 @@ final class GeoNamesClientTest extends TestCase
         [...$client->fetchAllCities()];
     }
 
+    #[Test]
     public function testFetchAllCitiesThrowsOnInvalidArchive(): void
     {
         $client = new GeoNamesClient(

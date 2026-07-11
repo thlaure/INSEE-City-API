@@ -100,8 +100,8 @@ tests-unit: ## Run unit tests
 tests-integration: ## Run integration tests
 	docker compose exec app vendor/bin/phpunit --testsuite=Integration
 
-tests: ## Run all tests
-	docker compose exec app vendor/bin/phpunit
+tests: ## Run all tests with testdox output and a coverage summary
+	docker compose exec -e XDEBUG_MODE=coverage app vendor/bin/phpunit --testdox --coverage-html var/coverage --coverage-text
 
 tests-coverage: ## Run unit tests with coverage report (HTML + text)
 	docker compose exec -e XDEBUG_MODE=coverage app vendor/bin/phpunit --testsuite=Unit --coverage-html var/coverage --coverage-text

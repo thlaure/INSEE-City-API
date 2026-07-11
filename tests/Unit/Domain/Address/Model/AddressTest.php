@@ -6,10 +6,12 @@ namespace App\Tests\Unit\Domain\Address\Model;
 
 use App\Domain\Address\Model\Address;
 use App\Domain\Shared\Model\CountryCode;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 final class AddressTest extends TestCase
 {
+    #[Test]
     public function testConstructorCreatesAddressWithValidData(): void
     {
         $address = new Address(
@@ -33,6 +35,7 @@ final class AddressTest extends TestCase
         $this->assertSame(2.331141, $address->longitude);
     }
 
+    #[Test]
     public function testConstructorAllowsNullOptionalFields(): void
     {
         $address = new Address(
@@ -53,6 +56,7 @@ final class AddressTest extends TestCase
         $this->assertNull($address->countryCode);
     }
 
+    #[Test]
     public function testConstructorRejectsEmptyLabel(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -70,6 +74,7 @@ final class AddressTest extends TestCase
         );
     }
 
+    #[Test]
     public function testConstructorRejectsOutOfRangeLatitude(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -87,6 +92,7 @@ final class AddressTest extends TestCase
         );
     }
 
+    #[Test]
     public function testConstructorRejectsOutOfRangeLongitude(): void
     {
         $this->expectException(\InvalidArgumentException::class);
